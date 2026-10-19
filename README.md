@@ -187,28 +187,28 @@ l'acceptation de l'invitation.
 
 ## 10. Captures des formulaires papier de l'exercice
 
-Les captures ci-dessous reproduisent les pages de l'exercice fournies. Elles sont intégrées directement dans ce README avec des chemins relatifs : elles s'afficheront aussi sur GitHub tant que le dossier `captures_formulaire` est conservé dans le dépôt.
+Les captures ci-dessous reproduisent les pages de l'exercice fournies. Elles sont intégrées directement dans ce README avec des chemins relatifs : elles s'afficheront aussi sur GitHub 
 
 ### Présentation de l'exercice — Ex13
 
-![Ex13 – Setting Up the Example](captures_formulaire/01_ex13_setting_up_example.png)
+![Ex13 – Setting Up the Example](01_ex13_setting_up_example.png)
 
 ### Ex13a — Instructions et critères d'évaluation
 
-![Ex13a – Instructions](captures_formulaire/02_ex13a_instructions.png)
+![Ex13a – Instructions](02_ex13a_instructions.png)
 
-![Ex13a – Critères complémentaires](captures_formulaire/03_ex13a_criteria.png)
+![Ex13a – Critères complémentaires](03_ex13a_criteria.png)
 
 ### Ex13a — Tableau des critères
 
-![Ex13a – Tableau des critères](captures_formulaire/04_ex13a_table.png)
+![Ex13a – Tableau des critères](04_ex13a_table.png)
 
-![Ex13a – Suite du tableau des critères](captures_formulaire/06_ex13a_table_continued.png)
+![Ex13a – Suite du tableau des critères](06_ex13a_table_continued.png)
 
 ### Ex13a — Graphique radar
 
-![Ex13a – Graphique radar vierge](captures_formulaire/05_ex13a_radar_graph.png)
+![Ex13a – Graphique radar vierge](05_ex13a_radar_graph.png)
 
 ### Ex13b — Fill in the Blanks
 
-![Ex13b – Formulaire à compléter](captures_formulaire/07_ex13b_fill_in_the_blanks.png)
+![Ex13b – Formulaire à compléter](07_ex13b_fill_in_the_blanks.png)
