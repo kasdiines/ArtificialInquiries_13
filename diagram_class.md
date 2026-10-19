@@ -1,52 +1,85 @@
-```mermaid
+# Diagramme de classes --- Ex13
+
+Le diagramme ci-dessous représente les données nécessaires pour
+documenter l'exemple choisi, saisir les huit notes de l'exercice Ex13a
+et conserver la justification rédigée pour Ex13b.
+
+``` mermaid
 classDiagram
-    class Oeuvre {
+    class ExempleProfessionnel {
         +int id
         +string titre
-        +string auteur
         +string description
-        +string contexte
+        +string domaine
+        +string urlReference
     }
 
-    class Pratique {
+    class Evaluation {
+        +int id
+        +date dateEvaluation
+        +string commentaireGeneral
+        +calculerScoreMoyen()
+    }
+
+    class Critere {
         +int id
         +string nom
         +string description
+        +string echelle
     }
 
-    class Valeur {
+    class NoteCritere {
         +int id
-        +string nom
+        +int valeur
+        +string commentaire
+    }
+
+    class Justification {
+        +int id
+        +string contributionPrincipale
+        +string domaineProfessionnel
+        +string problemeTraite
+        +string solutionProposee
+        +string valeursProfessionnelles
+        +string elementAEmuler
+    }
+
+    class RessourceDocumentaire {
+        +int id
+        +string titre
+        +string type
+        +string uri
         +string description
     }
 
-    class StandardProfessionnel {
-        +int id
-        +string nom
-        +string description
-    }
-
-    class Preuve {
-        +int id
-        +string extrait
-        +string source
-        +string localisation
-    }
-
-    class Analyse {
-        +int id
-        +string interpretation
-        +string justification
-    }
-
-    Oeuvre "1" --> "0..*" Pratique : met en oeuvre
-    Oeuvre "1" --> "0..*" Valeur : porte
-    Oeuvre "1" --> "0..*" StandardProfessionnel : reflete
-    Oeuvre "1" --> "0..*" Preuve : est documentee par
-
-    Analyse "1" --> "1" Oeuvre : concerne
-    Analyse "0..*" --> "0..1" Pratique : analyse
-    Analyse "0..*" --> "0..1" Valeur : analyse
-    Analyse "0..*" --> "0..1" StandardProfessionnel : analyse
-    Analyse "1" --> "1..*" Preuve : s'appuie sur
+    ExempleProfessionnel "1" --> "0..*" Evaluation : est évalué dans
+    Evaluation "1" *-- "8" NoteCritere : contient
+    Critere "1" --> "0..*" NoteCritere : définit
+    Evaluation "1" --> "0..1" Justification : possède
+    ExempleProfessionnel "1" --> "0..*" RessourceDocumentaire : documenté par
 ```
+
+## Règles de gestion
+
+-   Une évaluation porte sur un exemple professionnel.
+-   Une évaluation comporte une note pour chacun des huit critères.
+-   Une note est comprise entre **1 et 5**.
+-   Chaque note est associée à un critère unique.
+-   Une évaluation peut posséder une justification textuelle.
+-   Un exemple peut être documenté par plusieurs ressources.
+
+## Critères à initialiser
+
+Les huit critères à créer sont : `Frequency`, `Professional Stakes`,
+`Expertise Required`, `Effort and Resources`, `Collaboration`,
+`Error Tolerance`, `Standardisation` et `Professional Pride`.
+
+## Lien avec Omeka S
+
+Ce diagramme est un modèle conceptuel pour expliquer les données de
+l'exercice. Il ne signifie pas que ces classes doivent être créées
+automatiquement comme tables MySQL dans Omeka S. Dans Omeka S, les
+exemples et les ressources peuvent être représentés par des **items**,
+avec des métadonnées et des vocabulaires adaptés. Une extension ou un
+développement spécifique serait nécessaire pour automatiser la saisie
+des notes et le calcul du graphique radar.
