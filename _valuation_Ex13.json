@@ -1,0 +1,155 @@
+{
+    "o:label": "\u00c9valuation Ex13",
+    "o:resource_template_property": [
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "title",
+            "label": "Title"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "http:\/\/purl.org\/dc\/terms\/",
+            "vocabulary_label": "Dublin Core",
+            "local_name": "description",
+            "label": "Description"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "evaluationDate",
+            "label": "Evaluation date"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "frequencyScore",
+            "label": "Frequency score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "generalComment",
+            "label": "General comment"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "professionalStakesScore",
+            "label": "Professional stakes score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "expertiseRequiredScore",
+            "label": "Expertise required score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "effortResourcesScore",
+            "label": "Effort and resources score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "collaborationScore",
+            "label": "Collaboration score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "errorToleranceScore",
+            "label": "Error tolerance score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "standardisationScore",
+            "label": "Standardisation score"
+        },
+        {
+            "o:alternate_label": null,
+            "o:alternate_comment": null,
+            "o:is_required": false,
+            "o:is_private": false,
+            "o:default_lang": null,
+            "data_types": [],
+            "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+            "vocabulary_label": "Artificial Inquiries",
+            "local_name": "professionalPrideScore",
+            "label": "Professional pride score"
+        }
+    ],
+    "o:resource_class": {
+        "vocabulary_namespace_uri": "https:\/\/humanum-p8.fr\/omk_artificialinquiries\/onto\/artinq#",
+        "vocabulary_label": "Artificial Inquiries",
+        "local_name": "Evaluation",
+        "label": "Evaluation"
+    }
+}
