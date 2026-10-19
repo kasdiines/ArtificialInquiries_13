@@ -1,132 +1,214 @@
-# Artificial Inquiries — Exercice 13
-<img width="759" height="283" alt="image" src="https://github.com/user-attachments/assets/29e4ff33-8a8f-43c1-a331-083fbcd5953d" />
+# Artificial Inquiries --- Exercice 13
 
 ## 1. Présentation de l'exercice
 
-**Ex13 - Setting Up the Example** consiste à étudier une œuvre choisie comme exemple afin de comprendre pourquoi elle est considérée comme pertinente.
+L'exercice **Ex13 -- Setting Up the Example** consiste à choisir un
+travail professionnel exemplaire, à expliquer son contexte et à évaluer
+les caractéristiques qui le rendent pertinent. Les deux supports fournis
+sont :
 
-Pour cet exercice, j'ai choisi **Wikipédia**, une encyclopédie collaborative et libre.
+-   **Ex13a -- Mapping Exemplary Patterns / Playground** : évaluation du
+    document ou travail choisi à l'aide de huit critères notés de 1 à 5,
+    puis représentation des notes sous la forme d'un graphique radar.
+-   **Ex13b -- Fill in the Blanks** : rédaction d'un paragraphe
+    justifiant le caractère exemplaire du travail choisi.
 
-Ce choix permet d'étudier plusieurs dimensions :
+Pour ce dépôt, l'exemple retenu est **Wikipédia**, considéré comme un
+exemple de documentation collaborative et de partage de connaissances.
+L'analyse porte sur le fonctionnement de l'encyclopédie et sur les
+pratiques de rédaction, de vérification et de collaboration qu'elle
+illustre.
 
-- le contexte dans lequel Wikipédia a été créé ;
-- les pratiques mises en œuvre par les contributeurs ;
-- les valeurs défendues par le projet ;
-- les standards et règles utilisés pour produire et vérifier les contenus.
+## 2. Objectifs
 
-L'objectif est ensuite de transformer cette analyse en un outil numérique permettant de structurer les informations recueillies.
+1.  Décrire le contexte et l'intérêt de l'exemple retenu.
+2.  Évaluer cet exemple selon huit critères communs.
+3.  Visualiser l'évaluation avec un graphique radar.
+4.  Rédiger une justification structurée de son caractère exemplaire.
+5.  Décrire les données dans un modèle de classes réutilisable.
+6.  Préparer un environnement Omeka S local pour organiser et documenter
+    les ressources du projet.
 
-## 2. L'œuvre choisie : Wikipédia
+## 3. Critères d'évaluation
 
-Wikipédia est un projet d'encyclopédie collaborative accessible sur Internet. Les contenus sont produits et modifiés par des contributeurs.
+Chaque critère reçoit une note entière de **1 à 5**. Les notes
+ci-dessous sont une **proposition initiale à discuter et à ajuster**, et
+non des résultats mesurés ou imposés par le formulaire.
 
-Je considère Wikipédia comme un exemple intéressant pour cet exercice car son fonctionnement repose sur la collaboration, le partage des connaissances et des règles permettant d'organiser et de contrôler la qualité des contenus.
+  ------------------------------------------------------------------------
+  Critère               Signification                        Note proposée
+  --------------------- --------------------- ----------------------------
+  Frequency             Fréquence à laquelle                             5
+                        ce type de document   
+                        est produit ou        
+                        consulté              
 
-### Contexte
+  Professional Stakes   Conséquences d'une                               4
+                        réussite ou d'un      
+                        échec pour la         
+                        réputation            
+                        professionnelle       
 
-Wikipédia s'inscrit dans le développement des projets collaboratifs sur Internet. Son fonctionnement repose sur la participation de nombreux utilisateurs qui peuvent créer, modifier et améliorer les articles.
+  Expertise Required    Niveau de                                        3
+                        connaissances et de   
+                        compétences           
+                        spécialisées requis   
 
-### Pratiques
+  Effort and Resources  Temps, effort et                                 4
+                        outils nécessaires    
 
-Les principales pratiques que je peux identifier sont :
+  Collaboration         Importance du travail                            5
+                        collectif             
 
-- la rédaction collaborative ;
-- la modification des articles ;
-- la vérification des informations ;
-- l'utilisation de sources ;
-- les échanges entre contributeurs ;
-- la discussion autour des modifications.
+  Error Tolerance       À quel point                                     5
+                        l'absence d'erreur    
+                        est essentielle       
 
-### Valeurs
+  Standardisation       Degré de                                         4
+                        standardisation du    
+                        type de document      
 
-Les valeurs que je peux associer à Wikipédia sont notamment :
+  Professional Pride    Contribution au                                  4
+                        sentiment             
+                        d'accomplissement     
+                        professionnel         
+  ------------------------------------------------------------------------
 
-- le partage des connaissances ;
-- l'accès libre à l'information ;
-- la collaboration ;
-- la vérifiabilité des informations ;
-- la neutralité dans la présentation des sujets.
+Les valeurs doivent être revues par l'étudiant à partir de l'exemple
+concret retenu. Pour le critère **Error Tolerance**, une note élevée
+signifie que les erreurs sont peu tolérées.
 
-### Standards professionnels
+## 4. Proposition de paragraphe pour Ex13b
 
-Même si Wikipédia n'est pas une organisation professionnelle classique, son fonctionnement repose sur différentes règles et pratiques concernant la qualité de l'information.
+> Wikipédia est un exemple intéressant parce qu'il contribue à la
+> production et au partage de connaissances accessibles. Il s'inscrit
+> dans le domaine de la documentation et de la médiation de
+> l'information, où la fiabilité et la clarté sont essentielles. Il
+> répond au problème de la diffusion de connaissances à grande échelle
+> en proposant des articles modifiables et consultables en ligne. Son
+> fonctionnement se distingue par la collaboration entre contributeurs,
+> la possibilité de corriger les contenus et l'utilisation de références
+> pour étayer les informations. Il reflète des valeurs professionnelles
+> telles que la transparence, la vérifiabilité, la coopération et
+> l'amélioration continue. Je souhaite m'inspirer de sa structuration de
+> l'information, de la traçabilité des contributions et de ses
+> mécanismes de correction, car ces pratiques favorisent une
+> documentation compréhensible et réutilisable.
 
-Par exemple :
+Ce paragraphe est une base à personnaliser : il faut préciser ce que
+vous souhaitez réellement reproduire et justifier ce choix avec votre
+propre analyse.
 
-- citer les sources ;
-- permettre la vérification des informations ;
-- respecter certaines règles éditoriales ;
-- maintenir une organisation cohérente des articles.
+## 5. Solutions techniques envisagées
 
-## 3. Objectif de l'outil numérique
+### GitHub
 
-L'objectif est de transformer l'exercice d'analyse en un outil numérique permettant de créer une fiche pour une œuvre exemplaire.
+Le dépôt versionne les fichiers du projet, permet de documenter les
+choix et facilite le travail collaboratif. Le dépôt demandé est
+`ArtificialInquiries_13`.
 
-Pour Wikipédia, l'outil doit permettre de renseigner :
+### Mermaid
 
-- le nom de l'œuvre ;
-- son contexte ;
-- ses pratiques ;
-- ses valeurs ;
-- ses standards professionnels ;
-- les preuves permettant de justifier les observations ;
-- les sources utilisées ;
-- une analyse personnelle permettant d'expliquer les différents liens.
+Le fichier `diagram_class.md` contient un diagramme de classes Mermaid.
+Il modélise l'exemple étudié, ses critères, les évaluations, les notes
+et la justification textuelle. Le diagramme peut être prévisualisé ou
+testé sur [Mermaid Live Editor](https://mermaid.live/).
 
-L'objectif est donc de passer d'une analyse principalement textuelle à une représentation structurée des informations.
+### Omeka S
 
-## 4. Données principales
+Omeka S peut servir à organiser les ressources documentaires associées à
+l'exercice et à leur ajouter des métadonnées. Il ne calcule pas
+automatiquement le graphique radar par défaut : celui-ci peut être
+produit par un script ou une interface dédiée, puis associé à une
+ressource Omeka S.
 
-Le modèle de données contient plusieurs éléments :
+### Architecture locale
 
-- **Œuvre** : l'exemple étudié, ici Wikipédia ;
-- **Pratique** : une pratique mise en œuvre par l'œuvre ;
-- **Valeur** : une valeur représentée ou défendue par l'œuvre ;
-- **Standard professionnel** : une règle ou un standard associé au fonctionnement de l'œuvre ;
-- **Preuve** : un extrait ou une source permettant de justifier une observation ;
-- **Analyse** : l'interprétation permettant d'expliquer les relations entre l'œuvre et les différents éléments.
+-   **Apache** : serveur HTTP local.
+-   **PHP** : environnement d'exécution d'Omeka S.
+-   **MySQL** : base de données.
+-   **Omeka S** : gestion des ressources et de leurs métadonnées.
+-   **Mermaid** : représentation du modèle de données.
+-   **Git/GitHub** : versionnement et collaboration.
 
-Une œuvre peut être associée à plusieurs pratiques, valeurs, standards professionnels et preuves.
+Les versions exactes de PHP, MySQL et des extensions requises doivent
+être vérifiées dans la documentation officielle d'Omeka S avant
+l'installation.
 
-## 5. Solution technique
+## 6. Installation et test d'Omeka S
 
-Le modèle de données est représenté avec un **diagramme de classes réalisé avec Mermaid**.
+1.  Installer Apache, PHP, MySQL et les extensions PHP requises par la
+    version d'Omeka S choisie.
+2.  Télécharger Omeka S depuis le site officiel et placer les fichiers
+    dans le répertoire servi par Apache.
+3.  Créer une base de données MySQL et un utilisateur dédié à Omeka S.
+4.  Configurer le fichier de configuration de la base de données selon
+    la documentation officielle.
+5.  Ouvrir l'adresse locale du site dans un navigateur et suivre
+    l'assistant d'installation.
+6.  Créer le compte administrateur et terminer la configuration.
+7.  Se connecter à l'interface d'administration, créer un premier
+    contenu de test et vérifier qu'il est enregistré et consultable.
+8.  Documenter les versions installées, les étapes effectuées et les
+    éventuels messages d'erreur.
 
-Le diagramme se trouve dans le fichier :
+Documentation officielle : https://omeka.org/s/docs/user-manual/install/
 
-`diagram_class.md`
+### Critères de validation
 
-Pour la gestion des données et des ressources documentaires, **Omeka S** est utilisé comme environnement de travail local.
+-   La page d'accueil locale d'Omeka S s'affiche.
+-   L'accès à l'administration fonctionne.
+-   Un contenu de test peut être créé et enregistré.
+-   Les métadonnées du contenu sont visibles.
+-   Les étapes et les résultats des tests sont consignés dans le dépôt.
 
-L'installation repose sur :
+## 7. Collaborateur GitHub
 
-- Apache ;
-- PHP ;
-- MySQL ;
-- Omeka S.
+Ajouter le compte GitHub **`samszo`** dans les paramètres du dépôt :
+**Settings → Collaborators** (ou **Collaborators and teams**) → **Add
+people**. Sélectionner le bon compte et envoyer l'invitation. L'ajout
+n'est effectif qu'après l'action dans GitHub et, selon le cas,
+l'acceptation de l'invitation.
 
-## 6. Fonctionnement envisagé
+## 8. Fichiers du dépôt
 
-Le fonctionnement de l'outil est le suivant :
+-   `README.md` : description, modèle d'évaluation, solutions techniques
+    et protocole de test.
+-   `diagram_class.md` : diagramme de classes Mermaid.
+-   `captures_formulaire/` : captures des formulaires papier fournis.
 
-1. Sélectionner l'œuvre étudiée.
-2. Renseigner ses informations générales.
-3. Décrire son contexte.
-4. Identifier les pratiques associées.
-5. Identifier les valeurs représentées.
-6. Identifier les standards professionnels concernés.
-7. Ajouter les preuves et les sources.
-8. Ajouter une analyse permettant de justifier les observations.
-9. Consulter les informations sous une forme structurée.
+## 9. Références
 
-## 7. Évolution possible
+-   Documentation d'installation Omeka S :
+    https://omeka.org/s/docs/user-manual/install/
+-   Syntaxe des diagrammes de classes Mermaid :
+    https://mermaid.ai/open-source/syntax/classDiagram.html
+-   Éditeur Mermaid : https://mermaid.live/
 
-Dans une première version, l'outil permet de renseigner les principales informations concernant Wikipédia et son fonctionnement.
+## 10. Captures des formulaires papier de l'exercice
 
-Par la suite, il pourrait être amélioré afin de permettre :
+Les captures ci-dessous reproduisent les pages de l'exercice fournies. Elles sont intégrées directement dans ce README avec des chemins relatifs : elles s'afficheront aussi sur GitHub tant que le dossier `captures_formulaire` est conservé dans le dépôt.
 
-- la recherche dans les différentes œuvres étudiées ;
-- l'ajout de nouvelles œuvres exemplaires ;
-- la consultation des sources associées ;
-- la comparaison des pratiques et des valeurs entre plusieurs œuvres ;
-- une meilleure organisation des preuves et des analyses.
+### Présentation de l'exercice — Ex13
+
+![Ex13 – Setting Up the Example](captures_formulaire/01_ex13_setting_up_example.png)
+
+### Ex13a — Instructions et critères d'évaluation
+
+![Ex13a – Instructions](captures_formulaire/02_ex13a_instructions.png)
+
+![Ex13a – Critères complémentaires](captures_formulaire/03_ex13a_criteria.png)
+
+### Ex13a — Tableau des critères
+
+![Ex13a – Tableau des critères](captures_formulaire/04_ex13a_table.png)
+
+![Ex13a – Suite du tableau des critères](captures_formulaire/06_ex13a_table_continued.png)
+
+### Ex13a — Graphique radar
+
+![Ex13a – Graphique radar vierge](captures_formulaire/05_ex13a_radar_graph.png)
+
+### Ex13b — Fill in the Blanks
+
+![Ex13b – Formulaire à compléter](captures_formulaire/07_ex13b_fill_in_the_blanks.png)
