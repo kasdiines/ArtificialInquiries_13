@@ -1,0 +1,179 @@
+@prefix artinq: <https://humanum-p8.fr/omk_artificialinquiries/onto/artinq#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix o: <http://omeka.org/s/vocabs/o#> .
+
+<https://humanum-p8.fr/omk_artificialinquiries/onto/artinq#> a owl:Ontology ;
+    dcterms:title "Artificial Inquiries" .
+
+# Classes from the Ex13 class diagram
+artinq:ExemplaryWork a rdfs:Class ;
+    rdfs:label "Exemplary work"@en, "Travail exemplaire"@fr ;
+    rdfs:comment "Professional work or document selected for analysis in Ex13."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:Evaluation a rdfs:Class ;
+    rdfs:label "Evaluation"@en, "Évaluation"@fr ;
+    rdfs:comment "Evaluation of an exemplary work using the eight Ex13 criteria."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:Criterion a rdfs:Class ;
+    rdfs:label "Criterion"@en, "Critère"@fr ;
+    rdfs:comment "One of the eight criteria used by the Ex13 evaluation."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:CriterionScore a rdfs:Class ;
+    rdfs:label "Criterion score"@en, "Note de critère"@fr ;
+    rdfs:comment "A score from 1 to 5 assigned to one evaluation criterion."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:Justification a rdfs:Class ;
+    rdfs:label "Justification"@en, "Justification"@fr ;
+    rdfs:comment "Text explaining why the selected work is exemplary, corresponding to Ex13b."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:DocumentaryResource a rdfs:Class ;
+    rdfs:label "Documentary resource"@en, "Ressource documentaire"@fr ;
+    rdfs:comment "A source used to document the exemplary work."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+# General properties
+artinq:professionalDomain a rdf:Property ;
+    rdfs:label "Professional domain"@en, "Domaine professionnel"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:referenceUrl a rdf:Property ;
+    rdfs:label "Reference URL"@en, "URL de référence"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:evaluationDate a rdf:Property ;
+    rdfs:label "Evaluation date"@en, "Date d'évaluation"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:generalComment a rdf:Property ;
+    rdfs:label "General comment"@en, "Commentaire général"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:hasEvaluation a rdf:Property ;
+    rdfs:label "Has evaluation"@en, "Possède une évaluation"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:hasCriterion a rdf:Property ;
+    rdfs:label "Has criterion"@en, "Concerne le critère"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:scoreValue a rdf:Property ;
+    rdfs:label "Score value (1–5)"@en, "Note (1–5)"@fr ;
+    rdfs:comment "Integer value from 1 to 5."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:scoreComment a rdf:Property ;
+    rdfs:label "Score comment"@en, "Commentaire de la note"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:hasJustification a rdf:Property ;
+    rdfs:label "Has justification"@en, "Possède une justification"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:hasDocumentaryResource a rdf:Property ;
+    rdfs:label "Has documentary resource"@en, "Possède une ressource documentaire"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+# The eight Ex13a scores
+artinq:frequencyScore a rdf:Property ;
+    rdfs:label "Frequency score"@en, "Note de fréquence"@fr ;
+    rdfs:comment "1=exceptionally, 5=routinely."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:professionalStakesScore a rdf:Property ;
+    rdfs:label "Professional stakes score"@en, "Note des enjeux professionnels"@fr ;
+    rdfs:comment "1=low impact, 5=critical."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:expertiseRequiredScore a rdf:Property ;
+    rdfs:label "Expertise required score"@en, "Note d'expertise requise"@fr ;
+    rdfs:comment "1=basic, 5=highly specialised."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:effortResourcesScore a rdf:Property ;
+    rdfs:label "Effort and resources score"@en, "Note des efforts et ressources"@fr ;
+    rdfs:comment "1=minimal effort, 5=significant investment."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:collaborationScore a rdf:Property ;
+    rdfs:label "Collaboration score"@en, "Note de collaboration"@fr ;
+    rdfs:comment "1=independent, 5=highly collaborative."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:errorToleranceScore a rdf:Property ;
+    rdfs:label "Error tolerance score"@en, "Note de tolérance aux erreurs"@fr ;
+    rdfs:comment "1=tolerates errors, 5=no room for error."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:standardisationScore a rdf:Property ;
+    rdfs:label "Standardisation score"@en, "Note de standardisation"@fr ;
+    rdfs:comment "1=context-dependent, 5=highly standardised."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:professionalPrideScore a rdf:Property ;
+    rdfs:label "Professional pride score"@en, "Note de fierté professionnelle"@fr ;
+    rdfs:comment "1=low pride, 5=high pride."@en ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+# The Ex13b fill-in-the-blanks fields
+artinq:primaryContribution a rdf:Property ;
+    rdfs:label "Primary contribution"@en, "Contribution principale"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:professionalField a rdf:Property ;
+    rdfs:label "Professional field"@en, "Champ professionnel"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:problemChallenge a rdf:Property ;
+    rdfs:label "Problem or challenge"@en, "Problème ou défi"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:distinctiveSolution a rdf:Property ;
+    rdfs:label "Distinctive solution"@en, "Solution distinctive"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:professionalValues a rdf:Property ;
+    rdfs:label "Professional values or standards"@en, "Valeurs ou normes professionnelles"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
+
+artinq:aspectToEmulate a rdf:Property ;
+    rdfs:label "Aspect to emulate"@en, "Aspect à reproduire"@fr ;
+    rdfs:domain o:Resource ;
+    vs:term_status "experimental" .
