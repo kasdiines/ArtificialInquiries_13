@@ -51,26 +51,6 @@
             margin-top: 0;
         }
 
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 11px;
-            margin-top: 6px;
-            border: 1px solid #ccd3df;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-
-        textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-
         button {
             padding: 10px 16px;
             margin-top: 15px;
@@ -84,16 +64,6 @@
         .primary {
             background: #253b63;
             color: white;
-        }
-
-        .edit {
-            background: #e2ebff;
-            color: #253b63;
-        }
-
-        .delete {
-            background: #ffe4e4;
-            color: #a32222;
         }
 
         .item {
@@ -114,6 +84,13 @@
 
         .message {
             margin-top: 15px;
+        }
+
+        .error {
+            color: #a32222;
+        }
+
+        .success {
             color: #176b3a;
         }
 
@@ -134,42 +111,27 @@
 
 <main>
     <section class="card">
-        <h2 id="form-title">Ajouter un travail exemplaire</h2>
+        <h2>Connexion à Omeka S</h2>
 
-        <form id="work-form">
-            <input type="hidden" id="work-id">
+        <p>
+            Cette application récupère les travaux exemplaires
+            enregistrés dans Omeka S.
+        </p>
 
-            <label for="title">Titre *</label>
-            <input id="title" required
-                   placeholder="Ex. Wikipedia">
+        <button class="primary" id="reload-button" type="button">
+            Actualiser les travaux
+        </button>
 
-            <label for="description">Description</label>
-            <textarea id="description"
-                      placeholder="Décrivez le travail exemplaire"></textarea>
-
-            <label for="domain">Domaine professionnel</label>
-            <input id="domain"
-                   placeholder="Ex. Intelligence artificielle">
-
-            <label for="url">URL de référence</label>
-            <input id="url" type="url"
-                   placeholder="https://exemple.org">
-
-            <button class="primary" type="submit">
-                Enregistrer
-            </button>
-
-            <button type="button" id="cancel-button" hidden>
-                Annuler la modification
-            </button>
-        </form>
-
-        <p id="message" class="message" role="status"></p>
+        <p id="message" class="message" role="status">
+            Chargement des travaux...
+        </p>
     </section>
 
     <section class="card">
         <h2>Travaux exemplaires</h2>
-        <p id="counter">0 travail</p>
+
+        <p id="counter">Chargement...</p>
+
         <div id="work-list"></div>
     </section>
 </main>
@@ -179,160 +141,159 @@
 </footer>
 
 <script>
-    const STORAGE_KEY = "artificial-inquiries-demo";
+    const API_URL = "api.php";
 
-    let works = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
-    );
-
-    const form = document.getElementById("work-form");
     const list = document.getElementById("work-list");
     const message = document.getElementById("message");
-    const cancelButton = document.getElementById("cancel-button");
+    const counter = document.getElementById("counter");
+    const reloadButton = document.getElementById("reload-button");
 
-    function saveWorks() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(works));
+    function getValue(item, property) {
+        const values = item[property];
+
+        if (!Array.isArray(values) || values.length === 0) {
+            return "";
+        }
+
+        return values
+            .map(value => value["@value"] || "")
+            .filter(Boolean)
+            .join(", ");
     }
 
-    function renderWorks() {
+    function createParagraph(label, value) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = label + (value || "Non renseigné");
+        return paragraph;
+    }
+
+    function renderWorks(items) {
         list.replaceChildren();
 
-        document.getElementById("counter").textContent =
-            works.length + (works.length > 1
+        counter.textContent =
+            items.length + (items.length > 1
                 ? " travaux"
                 : " travail");
 
-        if (works.length === 0) {
+        if (items.length === 0) {
             const empty = document.createElement("p");
-            empty.textContent = "Aucun travail enregistré pour le moment.";
+            empty.textContent =
+                "Aucun travail exemplaire trouvé dans Omeka S.";
             list.appendChild(empty);
             return;
         }
 
-        works.forEach(function(work) {
+        items.forEach(function(item) {
             const article = document.createElement("article");
             article.className = "item";
 
             const title = document.createElement("h3");
-            title.textContent = work.title;
+            title.textContent =
+                item["o:title"] || "Sans titre";
             article.appendChild(title);
 
-            const description = document.createElement("p");
-            description.textContent = work.description || "Aucune description.";
-            article.appendChild(description);
+            const description = getValue(
+                item,
+                "dcterms:description"
+            );
 
-            const domain = document.createElement("p");
-            domain.textContent = "Domaine : " + (work.domain || "Non renseigné");
-            article.appendChild(domain);
+            article.appendChild(
+                createParagraph("Description : ", description)
+            );
 
-            if (work.url) {
-                const link = document.createElement("a");
-                link.href = work.url;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                link.textContent = "Consulter la référence";
-                article.appendChild(link);
+            const domain = getValue(
+                item,
+                "artinq:professionalDomain"
+            );
+
+            article.appendChild(
+                createParagraph("Domaine professionnel : ", domain)
+            );
+
+            const url = getValue(
+                item,
+                "artinq:referenceUrl"
+            );
+
+            if (url) {
+                try {
+                    const parsedUrl = new URL(url);
+
+                    if (["http:", "https:"].includes(parsedUrl.protocol)) {
+                        const link = document.createElement("a");
+                        link.href = parsedUrl.href;
+                        link.target = "_blank";
+                        link.rel = "noopener noreferrer";
+                        link.textContent = "Consulter la référence";
+                        article.appendChild(link);
+                    }
+                } catch (error) {
+                    article.appendChild(
+                        createParagraph("URL de référence : ", url)
+                    );
+                }
             }
 
-            const editButton = document.createElement("button");
-            editButton.className = "edit";
-            editButton.textContent = "Modifier";
-            editButton.addEventListener("click", function() {
-                document.getElementById("work-id").value = work.id;
-                document.getElementById("title").value = work.title;
-                document.getElementById("description").value = work.description;
-                document.getElementById("domain").value = work.domain;
-                document.getElementById("url").value = work.url;
-
-                document.getElementById("form-title").textContent =
-                    "Modifier un travail exemplaire";
-
-                cancelButton.hidden = false;
-                document.getElementById("title").focus();
-            });
-            article.appendChild(editButton);
-
-            const deleteButton = document.createElement("button");
-            deleteButton.className = "delete";
-            deleteButton.textContent = "Supprimer";
-            deleteButton.addEventListener("click", function() {
-                if (confirm("Voulez-vous vraiment supprimer ce travail ?")) {
-                    works = works.filter(function(item) {
-                        return item.id !== work.id;
-                    });
-
-                    saveWorks();
-                    renderWorks();
-                    resetForm();
-                    message.textContent = "Travail supprimé.";
-                }
-            });
-            article.appendChild(deleteButton);
+            const details = document.createElement("p");
+            details.textContent = "Identifiant Omeka S : " + item["o:id"];
+            article.appendChild(details);
 
             list.appendChild(article);
         });
     }
 
-    function resetForm() {
-        form.reset();
-        document.getElementById("work-id").value = "";
-        document.getElementById("form-title").textContent =
-            "Ajouter un travail exemplaire";
-        cancelButton.hidden = true;
+    async function loadWorks() {
+        reloadButton.disabled = true;
+        message.className = "message";
+        message.textContent = "Chargement des travaux depuis Omeka S...";
+        counter.textContent = "Chargement...";
+        list.replaceChildren();
+
+        try {
+            const response = await fetch(API_URL, {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Erreur HTTP " + response.status);
+            }
+
+            const data = await response.json();
+
+            if (!data.success || !Array.isArray(data.items)) {
+                throw new Error(
+                    data.message || "La réponse de l'API est incorrecte."
+                );
+            }
+
+            const works = data.items.filter(function(item) {
+                return Array.isArray(item["@type"])
+                    && item["@type"].includes("artinq:ExemplaryWork");
+            });
+
+            renderWorks(works);
+
+            message.className = "message success";
+            message.textContent =
+                "Connexion à Omeka S réussie. Travaux chargés : "
+                + works.length + ".";
+        } catch (error) {
+            counter.textContent = "Indisponible";
+
+            message.className = "message error";
+            message.textContent =
+                "Impossible de charger les travaux : "
+                + error.message
+                + ". Vérifie que XAMPP et Omeka S fonctionnent.";
+        } finally {
+            reloadButton.disabled = false;
+        }
     }
 
-    form.addEventListener("submit", function(event) {
-        event.preventDefault();
+    reloadButton.addEventListener("click", loadWorks);
 
-        const id = document.getElementById("work-id").value;
-        const title = document.getElementById("title").value.trim();
-        const url = document.getElementById("url").value.trim();
-
-        if (url) {
-            try {
-                const parsedUrl = new URL(url);
-                if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-                    throw new Error("URL non autorisée");
-                }
-            } catch {
-                message.textContent = "Veuillez saisir une URL valide.";
-                return;
-            }
-        }
-
-        const work = {
-            id: id || (crypto.randomUUID
-                ? crypto.randomUUID()
-                : String(Date.now())),
-            title: title,
-            description: document.getElementById("description").value.trim(),
-            domain: document.getElementById("domain").value.trim(),
-            url: url
-        };
-
-        if (id) {
-            works = works.map(function(item) {
-                return item.id === id ? work : item;
-            });
-            message.textContent = "Travail modifié.";
-        } else {
-            works.push(work);
-            message.textContent = "Travail enregistré.";
-        }
-
-        saveWorks();
-        renderWorks();
-        resetForm();
-    });
-
-    cancelButton.addEventListener("click", function() {
-        resetForm();
-        message.textContent = "";
-    });
-
-    renderWorks();
+    loadWorks();
 </script>
 
 </body>
 </html>
-
