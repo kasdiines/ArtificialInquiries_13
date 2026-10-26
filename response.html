@@ -1,1 +1,339 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artificial Inquiries</title>
 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            color: #263238;
+        }
+
+        header {
+            background: #253b63;
+            color: white;
+            padding: 25px 8%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+            color: #e0e7ff;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        h2 {
+            color: #253b63;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #ccd3df;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 16px;
+            margin-top: 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .primary {
+            background: #253b63;
+            color: white;
+        }
+
+        .edit {
+            background: #e2ebff;
+            color: #253b63;
+        }
+
+        .delete {
+            background: #ffe4e4;
+            color: #a32222;
+        }
+
+        .item {
+            border: 1px solid #e0e5ed;
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 15px;
+        }
+
+        .item h3 {
+            margin-top: 0;
+        }
+
+        .item a {
+            color: #2459a9;
+            overflow-wrap: anywhere;
+        }
+
+        .message {
+            margin-top: 15px;
+            color: #176b3a;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Artificial Inquiries</h1>
+    <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
+</header>
+
+<main>
+    <section class="card">
+        <h2 id="form-title">Ajouter un travail exemplaire</h2>
+
+        <form id="work-form">
+            <input type="hidden" id="work-id">
+
+            <label for="title">Titre *</label>
+            <input id="title" required
+                   placeholder="Ex. Wikipedia">
+
+            <label for="description">Description</label>
+            <textarea id="description"
+                      placeholder="Décrivez le travail exemplaire"></textarea>
+
+            <label for="domain">Domaine professionnel</label>
+            <input id="domain"
+                   placeholder="Ex. Intelligence artificielle">
+
+            <label for="url">URL de référence</label>
+            <input id="url" type="url"
+                   placeholder="https://exemple.org">
+
+            <button class="primary" type="submit">
+                Enregistrer
+            </button>
+
+            <button type="button" id="cancel-button" hidden>
+                Annuler la modification
+            </button>
+        </form>
+
+        <p id="message" class="message" role="status"></p>
+    </section>
+
+    <section class="card">
+        <h2>Travaux exemplaires</h2>
+        <p id="counter">0 travail</p>
+        <div id="work-list"></div>
+    </section>
+</main>
+
+<footer>
+    Artificial Inquiries — Projet WebCognictive
+</footer>
+
+<script>
+    const STORAGE_KEY = "artificial-inquiries-demo";
+
+    let works = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "[]"
+    );
+
+    const form = document.getElementById("work-form");
+    const list = document.getElementById("work-list");
+    const message = document.getElementById("message");
+    const cancelButton = document.getElementById("cancel-button");
+
+    function saveWorks() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(works));
+    }
+
+    function renderWorks() {
+        list.replaceChildren();
+
+        document.getElementById("counter").textContent =
+            works.length + (works.length > 1
+                ? " travaux"
+                : " travail");
+
+        if (works.length === 0) {
+            const empty = document.createElement("p");
+            empty.textContent = "Aucun travail enregistré pour le moment.";
+            list.appendChild(empty);
+            return;
+        }
+
+        works.forEach(function(work) {
+            const article = document.createElement("article");
+            article.className = "item";
+
+            const title = document.createElement("h3");
+            title.textContent = work.title;
+            article.appendChild(title);
+
+            const description = document.createElement("p");
+            description.textContent = work.description || "Aucune description.";
+            article.appendChild(description);
+
+            const domain = document.createElement("p");
+            domain.textContent = "Domaine : " + (work.domain || "Non renseigné");
+            article.appendChild(domain);
+
+            if (work.url) {
+                const link = document.createElement("a");
+                link.href = work.url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "Consulter la référence";
+                article.appendChild(link);
+            }
+
+            const editButton = document.createElement("button");
+            editButton.className = "edit";
+            editButton.textContent = "Modifier";
+            editButton.addEventListener("click", function() {
+                document.getElementById("work-id").value = work.id;
+                document.getElementById("title").value = work.title;
+                document.getElementById("description").value = work.description;
+                document.getElementById("domain").value = work.domain;
+                document.getElementById("url").value = work.url;
+
+                document.getElementById("form-title").textContent =
+                    "Modifier un travail exemplaire";
+
+                cancelButton.hidden = false;
+                document.getElementById("title").focus();
+            });
+            article.appendChild(editButton);
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete";
+            deleteButton.textContent = "Supprimer";
+            deleteButton.addEventListener("click", function() {
+                if (confirm("Voulez-vous vraiment supprimer ce travail ?")) {
+                    works = works.filter(function(item) {
+                        return item.id !== work.id;
+                    });
+
+                    saveWorks();
+                    renderWorks();
+                    resetForm();
+                    message.textContent = "Travail supprimé.";
+                }
+            });
+            article.appendChild(deleteButton);
+
+            list.appendChild(article);
+        });
+    }
+
+    function resetForm() {
+        form.reset();
+        document.getElementById("work-id").value = "";
+        document.getElementById("form-title").textContent =
+            "Ajouter un travail exemplaire";
+        cancelButton.hidden = true;
+    }
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const id = document.getElementById("work-id").value;
+        const title = document.getElementById("title").value.trim();
+        const url = document.getElementById("url").value.trim();
+
+        if (url) {
+            try {
+                const parsedUrl = new URL(url);
+                if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+                    throw new Error("URL non autorisée");
+                }
+            } catch {
+                message.textContent = "Veuillez saisir une URL valide.";
+                return;
+            }
+        }
+
+        const work = {
+            id: id || (crypto.randomUUID
+                ? crypto.randomUUID()
+                : String(Date.now())),
+            title: title,
+            description: document.getElementById("description").value.trim(),
+            domain: document.getElementById("domain").value.trim(),
+            url: url
+        };
+
+        if (id) {
+            works = works.map(function(item) {
+                return item.id === id ? work : item;
+            });
+            message.textContent = "Travail modifié.";
+        } else {
+            works.push(work);
+            message.textContent = "Travail enregistré.";
+        }
+
+        saveWorks();
+        renderWorks();
+        resetForm();
+    });
+
+    cancelButton.addEventListener("click", function() {
+        resetForm();
+        message.textContent = "";
+    });
+
+    renderWorks();
+</script>
+
+</body>
+</html>
+```
