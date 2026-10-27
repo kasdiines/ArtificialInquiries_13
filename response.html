@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Artificial Inquiries</title>
 
     <style>
@@ -54,7 +55,6 @@
         button {
             padding: 10px 16px;
             margin-top: 15px;
-            margin-right: 8px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -64,6 +64,11 @@
         .primary {
             background: #253b63;
             color: white;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
         }
 
         .item {
@@ -106,7 +111,7 @@
 
 <header>
     <h1>Artificial Inquiries</h1>
-    <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
+    <p>Gestion des exercices et des connaissances professionnelles</p>
 </header>
 
 <main>
@@ -114,21 +119,24 @@
         <h2>Connexion à Omeka S</h2>
 
         <p>
-            Cette application récupère les travaux exemplaires
-            enregistrés dans Omeka S.
+            Cette application récupère les exercices enregistrés
+            dans l'instance Omeka S commune.
         </p>
 
-        <button class="primary" id="reload-button" type="button">
-            Actualiser les travaux
+        <button
+            class="primary"
+            id="reload-button"
+            type="button">
+            Actualiser les exercices
         </button>
 
         <p id="message" class="message" role="status">
-            Chargement des travaux...
+            Chargement des exercices...
         </p>
     </section>
 
     <section class="card">
-        <h2>Travaux exemplaires</h2>
+        <h2>Exercices enregistrés</h2>
 
         <p id="counter">Chargement...</p>
 
@@ -141,24 +149,29 @@
 </footer>
 
 <script>
-    const API_URL = "api.php";
+    // API publique de l'instance Omeka S commune.
+    const API_URL =
+        "https://humanum-p8.fr/omk_artificialinquiries/api/items?per_page=100";
+
+    // Identifiant de la classe Exercice observé dans les données.
+    const EXERCISE_CLASS_ID = 134;
 
     const list = document.getElementById("work-list");
     const message = document.getElementById("message");
     const counter = document.getElementById("counter");
     const reloadButton = document.getElementById("reload-button");
 
-    function getValue(item, property) {
+    // Récupère les valeurs d'une propriété Omeka.
+    function getValues(item, property) {
         const values = item[property];
 
-        if (!Array.isArray(values) || values.length === 0) {
-            return "";
+        if (!Array.isArray(values)) {
+            return [];
         }
 
-        return values
-            .map(value => value["@value"] || "")
-            .filter(Boolean)
-            .join(", ");
+        return values.map(value =>
+            value["@value"] || value["@id"] || ""
+        ).filter(Boolean);
     }
 
     function createParagraph(label, value) {
@@ -167,18 +180,31 @@
         return paragraph;
     }
 
-    function renderWorks(items) {
+    // Vérifie que l'élément appartient à la classe Exercice.
+    function isExercise(item) {
+        const classId = item["o:resource_class"]?.["o:id"];
+
+        const types = Array.isArray(item["@type"])
+            ? item["@type"]
+            : [];
+
+        return Number(classId) === EXERCISE_CLASS_ID
+            || types.includes("artinq:Exercice");
+    }
+
+    function renderExercises(items) {
         list.replaceChildren();
 
         counter.textContent =
-            items.length + (items.length > 1
-                ? " travaux"
-                : " travail");
+            items.length +
+            (items.length > 1 ? " exercices" : " exercice");
 
         if (items.length === 0) {
             const empty = document.createElement("p");
+
             empty.textContent =
-                "Aucun travail exemplaire trouvé dans Omeka S.";
+                "Aucun exercice trouvé dans les résultats de l'API.";
+
             list.appendChild(empty);
             return;
         }
@@ -188,69 +214,106 @@
             article.className = "item";
 
             const title = document.createElement("h3");
-            title.textContent =
-                item["o:title"] || "Sans titre";
+            title.textContent = item["o:title"] || "Sans titre";
             article.appendChild(title);
 
-            const description = getValue(
+            const description = getValues(
                 item,
                 "dcterms:description"
-            );
+            ).join(", ");
 
-            article.appendChild(
-                createParagraph("Description : ", description)
-            );
+            if (description) {
+                article.appendChild(
+                    createParagraph("Description : ", description)
+                );
+            }
 
-            const domain = getValue(
+            // Propriété personnalisée observée dans la base commune.
+            const exampleLinks = getValues(
                 item,
-                "artinq:professionalDomain"
+                "artinq:aPourExemple"
             );
 
-            article.appendChild(
-                createParagraph("Domaine professionnel : ", domain)
-            );
+            if (exampleLinks.length > 0) {
+                exampleLinks.forEach(function(url) {
+                    try {
+                        const parsedUrl = new URL(url);
 
-            const url = getValue(
-                item,
-                "artinq:referenceUrl"
-            );
+                        if (
+                            parsedUrl.protocol === "https:" ||
+                            parsedUrl.protocol === "http:"
+                        ) {
+                            const link = document.createElement("a");
+                            link.href = parsedUrl.href;
+                            link.target = "_blank";
+                            link.rel = "noopener noreferrer";
+                            link.textContent = "Consulter l'exemple";
 
-            if (url) {
+                            article.appendChild(link);
+                        }
+                    } catch (error) {
+                        article.appendChild(
+                            createParagraph("Exemple : ", url)
+                        );
+                    }
+                });
+            }
+
+            // Source bibliographique ou lien associé à l'exercice.
+            const sources = getValues(item, "dcterms:source");
+
+            sources.forEach(function(source) {
                 try {
-                    const parsedUrl = new URL(url);
+                    const parsedUrl = new URL(source);
 
-                    if (["http:", "https:"].includes(parsedUrl.protocol)) {
+                    if (
+                        parsedUrl.protocol === "https:" ||
+                        parsedUrl.protocol === "http:"
+                    ) {
                         const link = document.createElement("a");
                         link.href = parsedUrl.href;
                         link.target = "_blank";
                         link.rel = "noopener noreferrer";
-                        link.textContent = "Consulter la référence";
-                        article.appendChild(link);
+                        link.textContent = "Consulter la source";
+
+                        const paragraph = document.createElement("p");
+                        paragraph.appendChild(link);
+                        article.appendChild(paragraph);
+                    } else {
+                        article.appendChild(
+                            createParagraph("Source : ", source)
+                        );
                     }
                 } catch (error) {
                     article.appendChild(
-                        createParagraph("URL de référence : ", url)
+                        createParagraph("Source : ", source)
                     );
                 }
-            }
+            });
 
             const details = document.createElement("p");
-            details.textContent = "Identifiant Omeka S : " + item["o:id"];
-            article.appendChild(details);
+            details.textContent =
+                "Identifiant Omeka S : " + item["o:id"];
 
+            article.appendChild(details);
             list.appendChild(article);
         });
     }
 
-    async function loadWorks() {
+    async function loadExercises() {
         reloadButton.disabled = true;
+
         message.className = "message";
-        message.textContent = "Chargement des travaux depuis Omeka S...";
+        message.textContent = "Connexion à l'API Omeka S...";
         counter.textContent = "Chargement...";
         list.replaceChildren();
 
         try {
             const response = await fetch(API_URL, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/ld+json, application/json"
+                },
                 cache: "no-store"
             });
 
@@ -258,41 +321,41 @@
                 throw new Error("Erreur HTTP " + response.status);
             }
 
+            // L'API Omeka S renvoie normalement un tableau JSON-LD.
             const data = await response.json();
 
-            if (!data.success || !Array.isArray(data.items)) {
+            if (!Array.isArray(data)) {
                 throw new Error(
-                    data.message || "La réponse de l'API est incorrecte."
+                    "La réponse de l'API n'est pas une liste JSON."
                 );
             }
 
-            const works = data.items.filter(function(item) {
-                return Array.isArray(item["@type"])
-                    && item["@type"].includes("artinq:ExemplaryWork");
-            });
+            const exercises = data.filter(isExercise);
 
-            renderWorks(works);
+            renderExercises(exercises);
 
             message.className = "message success";
             message.textContent =
-                "Connexion à Omeka S réussie. Travaux chargés : "
-                + works.length + ".";
+                "Réponse de l'API reçue. Exercices affichés : " +
+                exercises.length + ".";
+
         } catch (error) {
             counter.textContent = "Indisponible";
 
             message.className = "message error";
             message.textContent =
-                "Impossible de charger les travaux : "
-                + error.message
-                + ". Vérifie que XAMPP et Omeka S fonctionnent.";
+                "Impossible de charger les exercices. " +
+                "Détail : " + error.message +
+                ". Vérifie l'accès à l'API et les restrictions CORS.";
+
         } finally {
             reloadButton.disabled = false;
         }
     }
 
-    reloadButton.addEventListener("click", loadWorks);
+    reloadButton.addEventListener("click", loadExercises);
 
-    loadWorks();
+    loadExercises();
 </script>
 
 </body>
