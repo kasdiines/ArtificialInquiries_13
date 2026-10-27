@@ -162,17 +162,28 @@
     const reloadButton = document.getElementById("reload-button");
 
     // Récupère les valeurs d'une propriété Omeka.
-    function getValues(item, property) {
-        const values = item[property];
+   function getValue(item, property) {
+    const values = item[property];
 
-        if (!Array.isArray(values)) {
-            return [];
-        }
-
-        return values.map(value =>
-            value["@value"] || value["@id"] || ""
-        ).filter(Boolean);
+    if (!Array.isArray(values) || values.length === 0) {
+        return "";
     }
+
+    return values
+        .map(value => {
+            if (value["@value"]) {
+                return value["@value"];
+            }
+
+            if (value["@id"]) {
+                return value["@id"];
+            }
+
+            return "";
+        })
+        .filter(Boolean)
+        .join(", ");
+}
 
     function createParagraph(label, value) {
         const paragraph = document.createElement("p");
