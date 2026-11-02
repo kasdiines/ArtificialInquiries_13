@@ -1,372 +1,170 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Artificial Inquiries</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6fa;
-            color: #263238;
-        }
-
-        header {
-            background: #253b63;
-            color: white;
-            padding: 25px 8%;
-        }
-
-        header h1 {
-            margin: 0 0 8px;
-        }
-
-        header p {
-            margin: 0;
-            color: #e0e7ff;
-        }
-
-        main {
-            max-width: 1000px;
-            margin: 35px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px #0000000d;
-        }
-
-        h2 {
-            color: #253b63;
-            margin-top: 0;
-        }
-
-        button {
-            padding: 10px 16px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .primary {
-            background: #253b63;
-            color: white;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
-
-        .item {
-            border: 1px solid #e0e5ed;
-            border-radius: 8px;
-            padding: 18px;
-            margin-top: 15px;
-        }
-
-        .item h3 {
-            margin-top: 0;
-        }
-
-        .item a {
-            color: #2459a9;
-            overflow-wrap: anywhere;
-        }
-
-        .message {
-            margin-top: 15px;
-        }
-
-        .error {
-            color: #a32222;
-        }
-
-        .success {
-            color: #176b3a;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #64748b;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artificial Inquiries – Exercices</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4f6fa; color: #1c2a3a; }
+    header { background: #243b63; color: #fff; padding: 28px 8%; }
+    header h1 { margin: 0 0 8px; font-size: 2.2rem; }
+    header p { margin: 0; font-size: 1.1rem; }
+    main { max-width: 1000px; margin: 28px auto; padding: 0 16px; }
+    section { background: #fff; border-radius: 16px; padding: 28px 32px; margin-bottom: 28px;
+              box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    h2 { margin-top: 0; color: #243b63; }
+    button { background: #243b63; color: #fff; border: 0; border-radius: 8px; padding: 14px 24px;
+             font-size: 1rem; font-weight: bold; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { margin-top: 18px; }
+    .error { color: #a61b1b; }
+    .ok { color: #1b7a3a; }
+    .exercise { border: 1px solid #dde3ee; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+    .exercise h3 { margin: 0 0 6px; color: #243b63; }
+    .exercise p.desc { margin: 0 0 10px; }
+    dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
+    dt { font-weight: bold; color: #4a5a73; }
+    dd { margin: 0; overflow-wrap: anywhere; }
+    a { color: #243b63; }
+  </style>
 </head>
-
 <body>
-
-<header>
+  <header>
     <h1>Artificial Inquiries</h1>
     <p>Gestion des exercices et des connaissances professionnelles</p>
-</header>
+  </header>
 
-<main>
-    <section class="card">
-        <h2>Connexion à Omeka S</h2>
-
-        <p>
-            Cette application récupère les exercices enregistrés
-            dans l'instance Omeka S commune.
-        </p>
-
-        <button
-            class="primary"
-            id="reload-button"
-            type="button">
-            Actualiser les exercices
-        </button>
-
-        <p id="message" class="message" role="status">
-            Chargement des exercices...
-        </p>
+  <main>
+    <section>
+      <h2>Connexion à Omeka S</h2>
+      <p>Cette application récupère les exercices enregistrés dans l'instance Omeka S commune.</p>
+      <button id="refresh" type="button">Actualiser les exercices</button>
+      <div id="status" role="status"></div>
     </section>
 
-    <section class="card">
-        <h2>Exercices enregistrés</h2>
-
-        <p id="counter">Chargement...</p>
-
-        <div id="work-list"></div>
+    <section>
+      <h2>Exercices enregistrés</h2>
+      <div id="list"><p>Indisponible</p></div>
     </section>
-</main>
+  </main>
 
-<footer>
-    Artificial Inquiries — Projet WebCognictive
-</footer>
+  <script>
+    // ====== CONFIGURATION ======
+    // Si l'API directe est bloquée par CORS, remplace API_BASE par l'URL de ton proxy,
+    // par exemple "https://TON-WORKER.workers.dev" (sans slash final).
+    const CONFIG = {
+      API_BASE: "https://humanum-p8.fr/omk_artificialinquiries/api",
+      RESOURCE_CLASS_ID: 134,   // classe des exercices (cf. admin/item?resource_class_id=134)
+      PER_PAGE: 100,
+      TIMEOUT_MS: 15000
+    };
 
-<script>
-    // API publique de l'instance Omeka S commune.
-    const API_URL =
-        "https://humanum-p8.fr/omk_artificialinquiries/api/items?per_page=100";
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("list");
+    const btn = document.getElementById("refresh");
 
-    // Identifiant de la classe Exercice observé dans les données.
-    const EXERCISE_CLASS_ID = 134;
-
-    const list = document.getElementById("work-list");
-    const message = document.getElementById("message");
-    const counter = document.getElementById("counter");
-    const reloadButton = document.getElementById("reload-button");
-
-    // Récupère les valeurs d'une propriété Omeka sous forme de tableau.
-    function getValues(item, property) {
-        const values = item[property];
-
-        if (!Array.isArray(values) || values.length === 0) {
-            return [];
-        }
-
-        return values
-            .map(value => {
-                if (value["@value"]) {
-                    return value["@value"];
-                }
-
-                if (value["@id"]) {
-                    return value["@id"];
-                }
-
-                return "";
-            })
-            .filter(Boolean);
+    function setStatus(msg, cls) {
+      statusEl.textContent = msg;
+      statusEl.className = cls || "";
     }
 
-    function createParagraph(label, value) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = label + (value || "Non renseigné");
-        return paragraph;
+    // Convertit une valeur JSON-LD d'Omeka en texte lisible
+    function valueToNode(v) {
+      if (v["@value"] !== undefined) return document.createTextNode(String(v["@value"]));
+      const label = v["display_title"] || v["o:label"];
+      const id = v["@id"];
+      if (id) {
+        const a = document.createElement("a");
+        a.href = id; a.target = "_blank"; a.rel = "noopener";
+        a.textContent = label || id;
+        return a;
+      }
+      return document.createTextNode(label || JSON.stringify(v));
     }
 
-    // Vérifie que l'élément appartient à la classe Exercice.
-    function isExercise(item) {
-        const classId = item["o:resource_class"]?.["o:id"];
-
-        const types = Array.isArray(item["@type"])
-            ? item["@type"]
-            : [];
-
-        return Number(classId) === EXERCISE_CLASS_ID
-            || types.includes("artinq:Exercice");
+    function firstText(item, keys) {
+      for (const k of keys) {
+        const arr = item[k];
+        if (Array.isArray(arr) && arr.length && arr[0]["@value"]) return arr[0]["@value"];
+      }
+      return null;
     }
 
-    function renderExercises(items) {
-        list.replaceChildren();
+    function renderExercise(item) {
+      const box = document.createElement("article");
+      box.className = "exercise";
 
-        counter.textContent =
-            items.length +
-            (items.length > 1 ? " exercices" : " exercice");
+      const h = document.createElement("h3");
+      h.textContent = item["o:title"] || firstText(item, ["dcterms:title", "artinq:titre"]) || "(sans titre)";
+      box.appendChild(h);
 
-        if (items.length === 0) {
-            const empty = document.createElement("p");
+      const desc = firstText(item, ["dcterms:description", "artinq:description"]);
+      if (desc) {
+        const p = document.createElement("p");
+        p.className = "desc";
+        p.textContent = desc;
+        box.appendChild(p);
+      }
 
-            empty.textContent =
-                "Aucun exercice trouvé dans les résultats de l'API.";
-
-            list.appendChild(empty);
-            return;
-        }
-
-        items.forEach(function(item) {
-            const article = document.createElement("article");
-            article.className = "item";
-
-            const title = document.createElement("h3");
-            title.textContent = item["o:title"] || "Sans titre";
-            article.appendChild(title);
-
-            const description = getValues(
-                item,
-                "dcterms:description"
-            ).join(", ");
-
-            if (description) {
-                article.appendChild(
-                    createParagraph("Description : ", description)
-                );
-            }
-
-            // Propriété personnalisée observée dans la base commune.
-            const exampleLinks = getValues(
-                item,
-                "artinq:aPourExemple"
-            );
-
-            if (exampleLinks.length > 0) {
-                exampleLinks.forEach(function(url) {
-                    try {
-                        const parsedUrl = new URL(url);
-
-                        if (
-                            parsedUrl.protocol === "https:" ||
-                            parsedUrl.protocol === "http:"
-                        ) {
-                            const link = document.createElement("a");
-                            link.href = parsedUrl.href;
-                            link.target = "_blank";
-                            link.rel = "noopener noreferrer";
-                            link.textContent = "Consulter l'exemple";
-
-                            article.appendChild(link);
-                        }
-                    } catch (error) {
-                        article.appendChild(
-                            createParagraph("Exemple : ", url)
-                        );
-                    }
-                });
-            }
-
-            // Source bibliographique ou lien associé à l'exercice.
-            const sources = getValues(item, "dcterms:source");
-
-            sources.forEach(function(source) {
-                try {
-                    const parsedUrl = new URL(source);
-
-                    if (
-                        parsedUrl.protocol === "https:" ||
-                        parsedUrl.protocol === "http:"
-                    ) {
-                        const link = document.createElement("a");
-                        link.href = parsedUrl.href;
-                        link.target = "_blank";
-                        link.rel = "noopener noreferrer";
-                        link.textContent = "Consulter la source";
-
-                        const paragraph = document.createElement("p");
-                        paragraph.appendChild(link);
-                        article.appendChild(paragraph);
-                    } else {
-                        article.appendChild(
-                            createParagraph("Source : ", source)
-                        );
-                    }
-                } catch (error) {
-                    article.appendChild(
-                        createParagraph("Source : ", source)
-                    );
-                }
-            });
-
-            const details = document.createElement("p");
-            details.textContent =
-                "Identifiant Omeka S : " + item["o:id"];
-
-            article.appendChild(details);
-            list.appendChild(article);
+      // Autres propriétés (dcterms:*, artinq:*, etc.), affichées avec leur libellé
+      const shown = new Set(["dcterms:title", "dcterms:description", "artinq:titre", "artinq:description"]);
+      const dl = document.createElement("dl");
+      for (const [key, vals] of Object.entries(item)) {
+        if (key.startsWith("@") || key.startsWith("o:") || shown.has(key)) continue;
+        if (!Array.isArray(vals) || !vals.length || typeof vals[0] !== "object") continue;
+        const dt = document.createElement("dt");
+        dt.textContent = vals[0]["property_label"] || key;
+        const dd = document.createElement("dd");
+        vals.forEach((v, i) => {
+          if (i) dd.appendChild(document.createTextNode(" ; "));
+          dd.appendChild(valueToNode(v));
         });
+        dl.append(dt, dd);
+      }
+      if (dl.children.length) box.appendChild(dl);
+      return box;
     }
 
     async function loadExercises() {
-        reloadButton.disabled = true;
+      btn.disabled = true;
+      setStatus("Chargement…");
+      const url = CONFIG.API_BASE + "/items?resource_class_id=" + CONFIG.RESOURCE_CLASS_ID +
+                  "&per_page=" + CONFIG.PER_PAGE;
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
+      try {
+        const res = await fetch(url, { headers: { "Accept": "application/json" }, signal: ctrl.signal });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const items = await res.json();
 
-        message.className = "message";
-        message.textContent = "Connexion à l'API Omeka S...";
-        counter.textContent = "Chargement...";
-        list.replaceChildren();
-
-        try {
-            const response = await fetch(API_URL, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/ld+json, application/json"
-                },
-                cache: "no-store"
-            });
-
-            if (!response.ok) {
-                throw new Error("Erreur HTTP " + response.status);
-            }
-
-            // L'API Omeka S renvoie normalement un tableau JSON-LD.
-            const data = await response.json();
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "La réponse de l'API n'est pas une liste JSON."
-                );
-            }
-
-            const exercises = data.filter(isExercise);
-
-            renderExercises(exercises);
-
-            message.className = "message success";
-            message.textContent =
-                "Réponse de l'API reçue. Exercices affichés : " +
-                exercises.length + ".";
-
-        } catch (error) {
-            counter.textContent = "Indisponible";
-
-            message.className = "message error";
-            message.textContent =
-                "Impossible de charger les exercices. " +
-                "Détail : " + error.message +
-                ". Vérifie l'accès à l'API et les restrictions CORS.";
-
-        } finally {
-            reloadButton.disabled = false;
+        listEl.replaceChildren();
+        if (!items.length) {
+          listEl.innerHTML = "<p>Aucun exercice trouvé.</p>";
+        } else {
+          items.forEach(it => listEl.appendChild(renderExercise(it)));
         }
+        setStatus(items.length + " exercice(s) chargé(s).", "ok");
+      } catch (err) {
+        listEl.innerHTML = "<p>Indisponible</p>";
+        let hint = "";
+        if (location.protocol === "file:") {
+          hint = " Ouvre la page depuis un serveur (GitHub Pages ou « python -m http.server »), pas en double-cliquant sur le fichier.";
+        } else if (err.name === "AbortError") {
+          hint = " Délai dépassé.";
+        } else if (err instanceof TypeError) {
+          hint = " Probablement CORS : le serveur Omeka n'autorise pas ce site. Demande l'en-tête Access-Control-Allow-Origin ou utilise un proxy (voir CONFIG.API_BASE).";
+        }
+        setStatus("Impossible de charger les exercices. Détail : " + err.message + "." + hint, "error");
+        console.error(err);
+      } finally {
+        clearTimeout(timer);
+        btn.disabled = false;
+      }
     }
 
-    reloadButton.addEventListener("click", loadExercises);
-
+    btn.addEventListener("click", loadExercises);
     loadExercises();
-</script>
-
+  </script>
 </body>
 </html>
