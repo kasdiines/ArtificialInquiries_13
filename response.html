@@ -161,29 +161,28 @@
     const counter = document.getElementById("counter");
     const reloadButton = document.getElementById("reload-button");
 
-    // Récupère les valeurs d'une propriété Omeka.
-   function getValue(item, property) {
-    const values = item[property];
+    // Récupère les valeurs d'une propriété Omeka sous forme de tableau.
+    function getValues(item, property) {
+        const values = item[property];
 
-    if (!Array.isArray(values) || values.length === 0) {
-        return "";
+        if (!Array.isArray(values) || values.length === 0) {
+            return [];
+        }
+
+        return values
+            .map(value => {
+                if (value["@value"]) {
+                    return value["@value"];
+                }
+
+                if (value["@id"]) {
+                    return value["@id"];
+                }
+
+                return "";
+            })
+            .filter(Boolean);
     }
-
-    return values
-        .map(value => {
-            if (value["@value"]) {
-                return value["@value"];
-            }
-
-            if (value["@id"]) {
-                return value["@id"];
-            }
-
-            return "";
-        })
-        .filter(Boolean)
-        .join(", ");
-}
 
     function createParagraph(label, value) {
         const paragraph = document.createElement("p");
