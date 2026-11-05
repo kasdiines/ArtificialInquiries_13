@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -135,10 +134,6 @@ footer {
       Actualiser les travaux
     </button>
 
-    <button id="logout-button" type="button">
-      Changer de mot de passe
-    </button>
-
     <p id="message" class="message" role="status">
       Chargement des travaux...
     </p>
@@ -197,9 +192,6 @@ const API_URL =
 const DOMAIN_PROPERTY = "artinq:domaineProfessionnel";
 const URL_PROPERTY = "artinq:url";
 
-// Le mot de passe est demandé à l'utilisateur.
-// Il n'est jamais écrit dans le code public GitHub.
-let APP_PASSWORD = sessionStorage.getItem("artinq_password") || null;
 
 // =====================================================
 // ELEMENTS HTML
@@ -210,7 +202,6 @@ const message = document.getElementById("message");
 const counter = document.getElementById("counter");
 
 const reloadButton = document.getElementById("reload-button");
-const logoutButton = document.getElementById("logout-button");
 
 const form = document.getElementById("work-form");
 const formTitle = document.getElementById("form-title");
@@ -219,42 +210,19 @@ const cancelButton = document.getElementById("cancel-button");
 
 let editingId = null;
 
-// =====================================================
-// GESTION DU MOT DE PASSE
-// =====================================================
-
-function askPassword() {
-  const password = prompt(
-    "Entrez le mot de passe de l'application Artificial Inquiries :"
-  );
-
-  if (!password) {
-    throw new Error("Mot de passe obligatoire pour accéder à Omeka S.");
-  }
-
-  APP_PASSWORD = password;
-  sessionStorage.setItem("artinq_password", password);
-
-  return password;
-}
 
 // =====================================================
-// FONCTION API
+// FONCTION API SANS MOT DE PASSE
 // =====================================================
 
 async function apiRequest(method, data = null) {
 
-  const password = APP_PASSWORD || askPassword();
-
   const options = {
     method: method,
-
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Authorization": "Bearer " + password
+      "Accept": "application/json"
     },
-
     cache: "no-store"
   };
 
@@ -272,23 +240,13 @@ async function apiRequest(method, data = null) {
     throw new Error("Réponse invalide du serveur Cloudflare.");
   }
 
-  if (response.status === 401) {
-    APP_PASSWORD = null;
-    sessionStorage.removeItem("artinq_password");
-
-    throw new Error(
-      "Mot de passe incorrect. Cliquez sur Changer de mot de passe."
-    );
-  }
-
   if (!response.ok || !result.success) {
-    throw new Error(
-      result.message || "Une erreur est survenue."
-    );
+    throw new Error(result.message || "Une erreur est survenue.");
   }
 
   return result;
 }
+
 
 // =====================================================
 // LECTURE DES PROPRIÉTÉS OMEKA
@@ -306,6 +264,7 @@ function getValue(item, property) {
     .join(", ");
 }
 
+
 // =====================================================
 // MESSAGES
 // =====================================================
@@ -315,6 +274,7 @@ function setMessage(text, type = "") {
   message.className = "message " + type;
   message.textContent = text;
 }
+
 
 // =====================================================
 // AFFICHAGE DES TRAVAUX
@@ -426,6 +386,7 @@ function renderWorks(items) {
   });
 }
 
+
 // =====================================================
 // CHARGEMENT DES TRAVAUX
 // =====================================================
@@ -477,6 +438,7 @@ async function loadWorks() {
   }
 }
 
+
 // =====================================================
 // FORMULAIRE
 // =====================================================
@@ -521,6 +483,7 @@ function startEditing(item) {
     block: "start"
   });
 }
+
 
 // =====================================================
 // AJOUT ET MODIFICATION
@@ -597,6 +560,7 @@ form.addEventListener("submit", async event => {
   }
 });
 
+
 // =====================================================
 // SUPPRESSION
 // =====================================================
@@ -637,21 +601,6 @@ async function deleteWork(item) {
   }
 }
 
-// =====================================================
-// CHANGER DE MOT DE PASSE
-// =====================================================
-
-logoutButton.addEventListener("click", () => {
-
-  APP_PASSWORD = null;
-
-  sessionStorage.removeItem("artinq_password");
-
-  setMessage(
-    "Mot de passe réinitialisé. Actualisez les travaux pour vous reconnecter."
-  );
-
-});
 
 // =====================================================
 // ÉVÉNEMENTS
