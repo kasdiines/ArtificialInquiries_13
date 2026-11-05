@@ -1,170 +1,670 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Artificial Inquiries – Exercices</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4f6fa; color: #1c2a3a; }
-    header { background: #243b63; color: #fff; padding: 28px 8%; }
-    header h1 { margin: 0 0 8px; font-size: 2.2rem; }
-    header p { margin: 0; font-size: 1.1rem; }
-    main { max-width: 1000px; margin: 28px auto; padding: 0 16px; }
-    section { background: #fff; border-radius: 16px; padding: 28px 32px; margin-bottom: 28px;
-              box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-    h2 { margin-top: 0; color: #243b63; }
-    button { background: #243b63; color: #fff; border: 0; border-radius: 8px; padding: 14px 24px;
-             font-size: 1rem; font-weight: bold; cursor: pointer; }
-    button:disabled { opacity: .6; cursor: wait; }
-    #status { margin-top: 18px; }
-    .error { color: #a61b1b; }
-    .ok { color: #1b7a3a; }
-    .exercise { border: 1px solid #dde3ee; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
-    .exercise h3 { margin: 0 0 6px; color: #243b63; }
-    .exercise p.desc { margin: 0 0 10px; }
-    dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
-    dt { font-weight: bold; color: #4a5a73; }
-    dd { margin: 0; overflow-wrap: anywhere; }
-    a { color: #243b63; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artificial Inquiries</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6fa;
+  color: #263238;
+}
+
+header {
+  background: #253b63;
+  color: white;
+  padding: 25px 8%;
+}
+
+header h1 { margin: 0 0 8px; }
+header p { margin: 0; color: #e0e7ff; }
+
+main {
+  max-width: 1000px;
+  margin: 35px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #0000000d;
+}
+
+h2 {
+  color: #253b63;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+input, textarea {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+button {
+  padding: 10px 16px;
+  margin-top: 15px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.primary {
+  background: #253b63;
+  color: white;
+}
+
+.edit {
+  background: #e6a23c;
+  color: #222;
+}
+
+.delete {
+  background: #b42318;
+  color: white;
+}
+
+.item {
+  border: 1px solid #e0e5ed;
+  border-radius: 8px;
+  padding: 18px;
+  margin-top: 15px;
+  overflow-wrap: anywhere;
+}
+
+.item h3 { margin-top: 0; }
+.item a { color: #2459a9; }
+
+.message { margin-top: 15px; }
+.error { color: #a32222; }
+.success { color: #176b3a; }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Artificial Inquiries</h1>
-    <p>Gestion des exercices et des connaissances professionnelles</p>
-  </header>
 
-  <main>
-    <section>
-      <h2>Connexion à Omeka S</h2>
-      <p>Cette application récupère les exercices enregistrés dans l'instance Omeka S commune.</p>
-      <button id="refresh" type="button">Actualiser les exercices</button>
-      <div id="status" role="status"></div>
-    </section>
+<header>
+  <h1>Artificial Inquiries</h1>
+  <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
+</header>
 
-    <section>
-      <h2>Exercices enregistrés</h2>
-      <div id="list"><p>Indisponible</p></div>
-    </section>
-  </main>
+<main>
 
-  <script>
-    // ====== CONFIGURATION ======
-    // Si l'API directe est bloquée par CORS, remplace API_BASE par l'URL de ton proxy,
-    // par exemple "https://TON-WORKER.workers.dev" (sans slash final).
-    const CONFIG = {
-      API_BASE: "https://humanum-p8.fr/omk_artificialinquiries/api",
-      RESOURCE_CLASS_ID: 134,   // classe des exercices (cf. admin/item?resource_class_id=134)
-      PER_PAGE: 100,
-      TIMEOUT_MS: 15000
-    };
+  <section class="card">
+    <h2>Connexion à Omeka S</h2>
+    <p>Gérez les travaux exemplaires enregistrés dans Omeka S.</p>
 
-    const statusEl = document.getElementById("status");
-    const listEl = document.getElementById("list");
-    const btn = document.getElementById("refresh");
+    <button class="primary" id="reload-button" type="button">
+      Actualiser les travaux
+    </button>
 
-    function setStatus(msg, cls) {
-      statusEl.textContent = msg;
-      statusEl.className = cls || "";
-    }
+    <button id="logout-button" type="button">
+      Changer de mot de passe
+    </button>
 
-    // Convertit une valeur JSON-LD d'Omeka en texte lisible
-    function valueToNode(v) {
-      if (v["@value"] !== undefined) return document.createTextNode(String(v["@value"]));
-      const label = v["display_title"] || v["o:label"];
-      const id = v["@id"];
-      if (id) {
-        const a = document.createElement("a");
-        a.href = id; a.target = "_blank"; a.rel = "noopener";
-        a.textContent = label || id;
-        return a;
-      }
-      return document.createTextNode(label || JSON.stringify(v));
-    }
+    <p id="message" class="message" role="status">
+      Chargement des travaux...
+    </p>
+  </section>
 
-    function firstText(item, keys) {
-      for (const k of keys) {
-        const arr = item[k];
-        if (Array.isArray(arr) && arr.length && arr[0]["@value"]) return arr[0]["@value"];
-      }
-      return null;
-    }
+  <section class="card">
+    <h2 id="form-title">Ajouter un travail exemplaire</h2>
 
-    function renderExercise(item) {
-      const box = document.createElement("article");
-      box.className = "exercise";
+    <form id="work-form">
 
-      const h = document.createElement("h3");
-      h.textContent = item["o:title"] || firstText(item, ["dcterms:title", "artinq:titre"]) || "(sans titre)";
-      box.appendChild(h);
+      <label for="title">Titre *</label>
+      <input id="title" name="title" required maxlength="250">
 
-      const desc = firstText(item, ["dcterms:description", "artinq:description"]);
-      if (desc) {
-        const p = document.createElement("p");
-        p.className = "desc";
-        p.textContent = desc;
-        box.appendChild(p);
-      }
+      <label for="description">Description</label>
+      <textarea id="description" name="description"></textarea>
 
-      // Autres propriétés (dcterms:*, artinq:*, etc.), affichées avec leur libellé
-      const shown = new Set(["dcterms:title", "dcterms:description", "artinq:titre", "artinq:description"]);
-      const dl = document.createElement("dl");
-      for (const [key, vals] of Object.entries(item)) {
-        if (key.startsWith("@") || key.startsWith("o:") || shown.has(key)) continue;
-        if (!Array.isArray(vals) || !vals.length || typeof vals[0] !== "object") continue;
-        const dt = document.createElement("dt");
-        dt.textContent = vals[0]["property_label"] || key;
-        const dd = document.createElement("dd");
-        vals.forEach((v, i) => {
-          if (i) dd.appendChild(document.createTextNode(" ; "));
-          dd.appendChild(valueToNode(v));
-        });
-        dl.append(dt, dd);
-      }
-      if (dl.children.length) box.appendChild(dl);
-      return box;
-    }
+      <label for="domain">Domaine professionnel</label>
+      <input id="domain" name="domain">
 
-    async function loadExercises() {
-      btn.disabled = true;
-      setStatus("Chargement…");
-      const url = CONFIG.API_BASE + "/items?resource_class_id=" + CONFIG.RESOURCE_CLASS_ID +
-                  "&per_page=" + CONFIG.PER_PAGE;
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
+      <label for="url">URL de référence</label>
+      <input id="url" name="url" type="url"
+             placeholder="https://exemple.com">
+
+      <button class="primary" id="save-button" type="submit">
+        Ajouter le travail
+      </button>
+
+      <button id="cancel-button" type="button" hidden>
+        Annuler la modification
+      </button>
+
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Travaux exemplaires</h2>
+    <p id="counter">Chargement...</p>
+    <div id="work-list"></div>
+  </section>
+
+</main>
+
+<footer>
+  Artificial Inquiries — Projet WebCognictive
+</footer>
+
+<script>
+
+// =====================================================
+// CONFIGURATION
+// =====================================================
+
+const API_URL =
+  "https://artificial-inquiries-api.ineskasdi03.workers.dev/";
+
+const DOMAIN_PROPERTY = "artinq:domaineProfessionnel";
+const URL_PROPERTY = "artinq:url";
+
+// Le mot de passe est demandé à l'utilisateur.
+// Il n'est jamais écrit dans le code public GitHub.
+let APP_PASSWORD = sessionStorage.getItem("artinq_password") || null;
+
+// =====================================================
+// ELEMENTS HTML
+// =====================================================
+
+const list = document.getElementById("work-list");
+const message = document.getElementById("message");
+const counter = document.getElementById("counter");
+
+const reloadButton = document.getElementById("reload-button");
+const logoutButton = document.getElementById("logout-button");
+
+const form = document.getElementById("work-form");
+const formTitle = document.getElementById("form-title");
+const saveButton = document.getElementById("save-button");
+const cancelButton = document.getElementById("cancel-button");
+
+let editingId = null;
+
+// =====================================================
+// GESTION DU MOT DE PASSE
+// =====================================================
+
+function askPassword() {
+  const password = prompt(
+    "Entrez le mot de passe de l'application Artificial Inquiries :"
+  );
+
+  if (!password) {
+    throw new Error("Mot de passe obligatoire pour accéder à Omeka S.");
+  }
+
+  APP_PASSWORD = password;
+  sessionStorage.setItem("artinq_password", password);
+
+  return password;
+}
+
+// =====================================================
+// FONCTION API
+// =====================================================
+
+async function apiRequest(method, data = null) {
+
+  const password = APP_PASSWORD || askPassword();
+
+  const options = {
+    method: method,
+
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer " + password
+    },
+
+    cache: "no-store"
+  };
+
+  if (data !== null) {
+    options.body = JSON.stringify(data);
+  }
+
+  const response = await fetch(API_URL, options);
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (_) {
+    throw new Error("Réponse invalide du serveur Cloudflare.");
+  }
+
+  if (response.status === 401) {
+    APP_PASSWORD = null;
+    sessionStorage.removeItem("artinq_password");
+
+    throw new Error(
+      "Mot de passe incorrect. Cliquez sur Changer de mot de passe."
+    );
+  }
+
+  if (!response.ok || !result.success) {
+    throw new Error(
+      result.message || "Une erreur est survenue."
+    );
+  }
+
+  return result;
+}
+
+// =====================================================
+// LECTURE DES PROPRIÉTÉS OMEKA
+// =====================================================
+
+function getValue(item, property) {
+
+  const values = item[property];
+
+  if (!Array.isArray(values)) return "";
+
+  return values
+    .map(value => value["@value"] || value["@id"] || "")
+    .filter(Boolean)
+    .join(", ");
+}
+
+// =====================================================
+// MESSAGES
+// =====================================================
+
+function setMessage(text, type = "") {
+
+  message.className = "message " + type;
+  message.textContent = text;
+}
+
+// =====================================================
+// AFFICHAGE DES TRAVAUX
+// =====================================================
+
+function addText(parent, tag, text) {
+
+  const element = document.createElement(tag);
+  element.textContent = text;
+  parent.appendChild(element);
+
+  return element;
+}
+
+function renderWorks(items) {
+
+  list.replaceChildren();
+
+  counter.textContent =
+    items.length + (items.length > 1 ? " travaux" : " travail");
+
+  if (!items.length) {
+    addText(list, "p", "Aucun travail exemplaire trouvé.");
+    return;
+  }
+
+  items.forEach(item => {
+
+    const article = document.createElement("article");
+    article.className = "item";
+
+    addText(
+      article,
+      "h3",
+      item["o:title"] || "Sans titre"
+    );
+
+    addText(
+      article,
+      "p",
+      "Description : " +
+      (getValue(item, "dcterms:description") || "Non renseignée")
+    );
+
+    addText(
+      article,
+      "p",
+      "Domaine professionnel : " +
+      (getValue(item, DOMAIN_PROPERTY) || "Non renseigné")
+    );
+
+    const url = getValue(item, URL_PROPERTY);
+
+    if (url) {
+
       try {
-        const res = await fetch(url, { headers: { "Accept": "application/json" }, signal: ctrl.signal });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const items = await res.json();
 
-        listEl.replaceChildren();
-        if (!items.length) {
-          listEl.innerHTML = "<p>Aucun exercice trouvé.</p>";
-        } else {
-          items.forEach(it => listEl.appendChild(renderExercise(it)));
+        const parsed = new URL(url);
+
+        if (["http:", "https:"].includes(parsed.protocol)) {
+
+          const link = document.createElement("a");
+
+          link.href = parsed.href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Consulter la référence";
+
+          article.appendChild(link);
         }
-        setStatus(items.length + " exercice(s) chargé(s).", "ok");
-      } catch (err) {
-        listEl.innerHTML = "<p>Indisponible</p>";
-        let hint = "";
-        if (location.protocol === "file:") {
-          hint = " Ouvre la page depuis un serveur (GitHub Pages ou « python -m http.server »), pas en double-cliquant sur le fichier.";
-        } else if (err.name === "AbortError") {
-          hint = " Délai dépassé.";
-        } else if (err instanceof TypeError) {
-          hint = " Probablement CORS : le serveur Omeka n'autorise pas ce site. Demande l'en-tête Access-Control-Allow-Origin ou utilise un proxy (voir CONFIG.API_BASE).";
-        }
-        setStatus("Impossible de charger les exercices. Détail : " + err.message + "." + hint, "error");
-        console.error(err);
-      } finally {
-        clearTimeout(timer);
-        btn.disabled = false;
+
+      } catch (_) {
+
+        addText(article, "p", "URL : " + url);
       }
     }
 
-    btn.addEventListener("click", loadExercises);
-    loadExercises();
-  </script>
+    addText(
+      article,
+      "p",
+      "Identifiant Omeka S : " + item["o:id"]
+    );
+
+    const editButton = document.createElement("button");
+
+    editButton.type = "button";
+    editButton.className = "edit";
+    editButton.textContent = "Modifier";
+
+    editButton.addEventListener("click", () => {
+      startEditing(item);
+    });
+
+    article.appendChild(editButton);
+
+    const deleteButton = document.createElement("button");
+
+    deleteButton.type = "button";
+    deleteButton.className = "delete";
+    deleteButton.textContent = "Supprimer";
+
+    deleteButton.addEventListener("click", () => {
+      deleteWork(item);
+    });
+
+    article.appendChild(deleteButton);
+
+    list.appendChild(article);
+  });
+}
+
+// =====================================================
+// CHARGEMENT DES TRAVAUX
+// =====================================================
+
+async function loadWorks() {
+
+  reloadButton.disabled = true;
+
+  setMessage("Chargement des travaux depuis Omeka S...");
+
+  counter.textContent = "Chargement...";
+  list.replaceChildren();
+
+  try {
+
+    const result = await apiRequest("GET");
+
+    if (!Array.isArray(result.items)) {
+      throw new Error("La liste des travaux est incorrecte.");
+    }
+
+    renderWorks(result.items);
+
+    const classId =
+      result.data && result.data.resource_class_id
+        ? " (classe Omeka " + result.data.resource_class_id + ")"
+        : "";
+
+    setMessage(
+      "Connexion à Omeka S réussie. Travaux chargés : " +
+      result.items.length +
+      classId +
+      ".",
+      "success"
+    );
+
+  } catch (error) {
+
+    counter.textContent = "Indisponible";
+
+    setMessage(
+      "Impossible de charger les travaux : " + error.message,
+      "error"
+    );
+
+  } finally {
+
+    reloadButton.disabled = false;
+  }
+}
+
+// =====================================================
+// FORMULAIRE
+// =====================================================
+
+function resetForm() {
+
+  editingId = null;
+
+  form.reset();
+
+  formTitle.textContent = "Ajouter un travail exemplaire";
+  saveButton.textContent = "Ajouter le travail";
+
+  cancelButton.hidden = true;
+}
+
+function startEditing(item) {
+
+  editingId = item["o:id"];
+
+  document.getElementById("title").value =
+    item["o:title"] || "";
+
+  document.getElementById("description").value =
+    getValue(item, "dcterms:description");
+
+  document.getElementById("domain").value =
+    getValue(item, DOMAIN_PROPERTY);
+
+  document.getElementById("url").value =
+    getValue(item, URL_PROPERTY);
+
+  formTitle.textContent = "Modifier le travail";
+
+  saveButton.textContent =
+    "Enregistrer les modifications";
+
+  cancelButton.hidden = false;
+
+  form.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+// =====================================================
+// AJOUT ET MODIFICATION
+// =====================================================
+
+form.addEventListener("submit", async event => {
+
+  event.preventDefault();
+
+  const title =
+    document.getElementById("title").value.trim();
+
+  const description =
+    document.getElementById("description").value.trim();
+
+  const domain =
+    document.getElementById("domain").value.trim();
+
+  const url =
+    document.getElementById("url").value.trim();
+
+  if (!title) {
+    setMessage("Le titre est obligatoire.", "error");
+    return;
+  }
+
+  const data = {
+    title,
+    description,
+    domain,
+    url
+  };
+
+  saveButton.disabled = true;
+
+  try {
+
+    if (editingId === null) {
+
+      await apiRequest("POST", data);
+
+      setMessage(
+        "Travail ajouté dans Omeka S.",
+        "success"
+      );
+
+    } else {
+
+      await apiRequest("PUT", {
+        id: editingId,
+        ...data
+      });
+
+      setMessage(
+        "Travail modifié dans Omeka S.",
+        "success"
+      );
+    }
+
+    resetForm();
+
+    await loadWorks();
+
+  } catch (error) {
+
+    setMessage(
+      "Erreur : " + error.message,
+      "error"
+    );
+
+  } finally {
+
+    saveButton.disabled = false;
+  }
+});
+
+// =====================================================
+// SUPPRESSION
+// =====================================================
+
+async function deleteWork(item) {
+
+  const id = item["o:id"];
+
+  const title = item["o:title"] || "ce travail";
+
+  const confirmation = confirm(
+    'Confirmer la suppression de "' +
+    title +
+    '" (identifiant ' +
+    id +
+    ') ? Cette action est irréversible.'
+  );
+
+  if (!confirmation) return;
+
+  try {
+
+    await apiRequest("DELETE", { id });
+
+    setMessage(
+      "Travail supprimé dans Omeka S.",
+      "success"
+    );
+
+    await loadWorks();
+
+  } catch (error) {
+
+    setMessage(
+      "Erreur de suppression : " + error.message,
+      "error"
+    );
+  }
+}
+
+// =====================================================
+// CHANGER DE MOT DE PASSE
+// =====================================================
+
+logoutButton.addEventListener("click", () => {
+
+  APP_PASSWORD = null;
+
+  sessionStorage.removeItem("artinq_password");
+
+  setMessage(
+    "Mot de passe réinitialisé. Actualisez les travaux pour vous reconnecter."
+  );
+
+});
+
+// =====================================================
+// ÉVÉNEMENTS
+// =====================================================
+
+reloadButton.addEventListener("click", loadWorks);
+
+cancelButton.addEventListener("click", resetForm);
+
+// Chargement initial
+loadWorks();
+
+</script>
+
 </body>
 </html>
