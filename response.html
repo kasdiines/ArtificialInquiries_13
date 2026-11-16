@@ -31,6 +31,11 @@ button:disabled { opacity: .6; cursor: wait; }
 .error { color: #a32222; }
 .success { color: #176b3a; }
 [hidden] { display: none !important; }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.method { margin: 0; padding: 14px; background: white; color: #253b63; border: 1px solid #cbd5e1; font-size: 16px; font-weight: normal; }
+.method.on { background: #253b63; color: white; border-color: #253b63; }
+.panel h3 { color: #253b63; margin: 10px 0 8px; }
+.button-link { display: inline-block; padding: 10px 16px; margin-top: 10px; border-radius: 6px; font-weight: bold; text-decoration: none; cursor: pointer; }
 footer { text-align: center; padding: 20px; color: #64748b; }
 </style>
 </head>
@@ -43,7 +48,7 @@ footer { text-align: center; padding: 20px; color: #64748b; }
     <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
   </div>
   <div id="user-bar" hidden>
-    Connectée à Omeka S
+    <span id="user-label">Connectée</span>
     <button id="logout-button" type="button">Se déconnecter</button>
   </div>
 </header>
@@ -52,19 +57,49 @@ footer { text-align: center; padding: 20px; color: #64748b; }
 
   <!-- CONNEXION -->
   <section class="card" id="login-card">
-    <h2>Connexion à Omeka S</h2>
-    <p class="hint">
-      Connecte-toi avec <b>tes</b> clés API Omeka
-      (dans Omeka : <i>Mon compte → Clés API</i>).
-      Elles restent dans cet onglet et sont effacées à sa fermeture.
-    </p>
-    <form id="login-form">
-      <label for="key-identity">Identifiant de clé (key_identity)</label>
-      <input id="key-identity" autocomplete="off" required>
-      <label for="key-credential">Clé secrète (key_credential)</label>
-      <input id="key-credential" type="password" autocomplete="off" required>
-      <button class="primary" id="login-button" type="submit">Se connecter</button>
-    </form>
+    <h2>Connexion</h2>
+    <p>Choisis ta méthode de connexion. Les données proviennent de l'Omeka S commun.</p>
+
+    <div class="methods" role="tablist">
+      <button type="button" class="method on" data-method="omeka">Omeka S</button>
+      <button type="button" class="method" data-method="cas">CAS Paris 8</button>
+      <button type="button" class="method" data-method="github">GitHub</button>
+      <button type="button" class="method" data-method="google">Google</button>
+    </div>
+
+    <!-- Omeka : clés API personnelles -->
+    <div class="panel" id="panel-omeka">
+      <h3>Connexion Omeka S</h3>
+      <p class="hint">
+        Saisis <b>tes</b> clés API Omeka (dans Omeka : <i>Mon compte → Clés API</i>).
+        Elles restent dans cet onglet et sont effacées à sa fermeture.
+      </p>
+      <form id="login-form">
+        <label for="key-identity">Identifiant de clé (key_identity)</label>
+        <input id="key-identity" autocomplete="off" required>
+        <label for="key-credential">Clé secrète (key_credential)</label>
+        <input id="key-credential" type="password" autocomplete="off" required>
+        <button class="primary" id="login-button" type="submit">Se connecter</button>
+      </form>
+    </div>
+
+    <!-- CAS, GitHub, Google : redirection vers le service -->
+    <div class="panel" id="panel-cas" hidden>
+      <h3>Connexion CAS Paris 8</h3>
+      <p>Tu seras redirigée vers le CAS de l'université Paris 8.</p>
+      <a class="primary button-link" data-auth="cas">Continuer</a>
+    </div>
+    <div class="panel" id="panel-github" hidden>
+      <h3>Connexion GitHub</h3>
+      <p>Tu seras redirigée vers GitHub pour autoriser l'application.</p>
+      <a class="primary button-link" data-auth="github">Continuer</a>
+    </div>
+    <div class="panel" id="panel-google" hidden>
+      <h3>Connexion Google</h3>
+      <p>Tu seras redirigée vers Google pour choisir ton compte.</p>
+      <a class="primary button-link" data-auth="google">Continuer</a>
+    </div>
+
     <p id="login-message" class="message" role="status"></p>
   </section>
 
@@ -127,30 +162,46 @@ let editingId = null;
 
 
 // =====================================================
-// CONNEXION UTILISATEUR (clés API Omeka)
+// CONNEXION UTILISATEUR
+//  - Omeka : clés API personnelles
+//  - CAS Paris 8, GitHub, Google : session signée par le Worker
 // =====================================================
 
-function getKeys() {
+const WORKER_BASE = API_URL.replace(/\/$/, "");
+
+function getSession() {
   try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY)); }
   catch (_) { return null; }
 }
 
-function saveKeys(keys) {
-  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(keys)); } catch (_) {}
+function saveSession(session) {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session)); } catch (_) {}
 }
 
-function clearKeys() {
+function clearSession() {
   try { sessionStorage.removeItem(STORAGE_KEY); } catch (_) {}
+}
+
+// Lit le nom et le service contenus dans la session signée
+function decodeToken(token) {
+  try {
+    let b = token.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+    while (b.length % 4) b += "=";
+    const bytes = Uint8Array.from(atob(b), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch (_) { return {}; }
 }
 
 function showLoggedIn(isLoggedIn) {
   $("login-card").hidden = isLoggedIn;
   $("app").hidden = !isLoggedIn;
   $("user-bar").hidden = !isLoggedIn;
+  const session = getSession();
+  $("user-label").textContent = session ? "Connectée via " + session.label : "";
 }
 
 function logout(text = "") {
-  clearKeys();
+  clearSession();
   resetForm();
   list.replaceChildren();
   showLoggedIn(false);
@@ -158,19 +209,35 @@ function logout(text = "") {
   $("login-message").textContent = text;
 }
 
+// Choix de la méthode
+document.querySelectorAll(".method").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".method").forEach(b => b.classList.toggle("on", b === button));
+    ["omeka", "cas", "github", "google"].forEach(m => {
+      $("panel-" + m).hidden = m !== button.dataset.method;
+    });
+    $("login-message").textContent = "";
+  });
+});
+
+// CAS, GitHub, Google : le Worker gère la redirection
+document.querySelectorAll("[data-auth]").forEach(link => {
+  link.href = WORKER_BASE + "/auth/" + link.dataset.auth;
+});
+
+// Omeka : vérification des clés en lisant les travaux
 $("login-form").addEventListener("submit", async event => {
   event.preventDefault();
-  const keys = {
+  saveSession({
+    type: "keys",
     identity: $("key-identity").value.trim(),
-    credential: $("key-credential").value.trim()
-  };
+    credential: $("key-credential").value.trim(),
+    label: "Omeka S"
+  });
   const loginButton = $("login-button");
   loginButton.disabled = true;
   $("login-message").className = "message";
   $("login-message").textContent = "Vérification des clés auprès d'Omeka...";
-  saveKeys(keys);
-
-  // Les clés sont validées en lisant les travaux : Omeka les refuse si elles sont fausses.
   const ok = await loadWorks();
   loginButton.disabled = false;
   if (ok) {
@@ -181,25 +248,45 @@ $("login-form").addEventListener("submit", async event => {
 
 $("logout-button").addEventListener("click", () => logout());
 
+// Retour de CAS, GitHub ou Google : #token=... ou #error=...
+function readLoginReturn() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const token = params.get("token");
+  const error = params.get("error");
+  if (!token && !error) return;
+  history.replaceState(null, "", location.pathname + location.search);
+  if (token) {
+    const info = decodeToken(token);
+    saveSession({
+      type: "token",
+      token,
+      label: (info.provider || "service externe") + (info.name ? " (" + info.name + ")" : "")
+    });
+  } else {
+    clearSession();
+    $("login-message").className = "message error";
+    $("login-message").textContent = error;
+  }
+}
+
 
 // =====================================================
 // APPEL AU WORKER
 // =====================================================
 
 async function apiRequest(method, data = null) {
-  const keys = getKeys();
-  if (!keys) throw Object.assign(new Error("Connexion requise."), { status: 401 });
+  const session = getSession();
+  if (!session) throw Object.assign(new Error("Connexion requise."), { status: 401 });
 
-  const options = {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "X-Omeka-Key-Identity": keys.identity,
-      "X-Omeka-Key-Credential": keys.credential
-    },
-    cache: "no-store"
-  };
+  const headers = { "Content-Type": "application/json", "Accept": "application/json" };
+  if (session.type === "token") {
+    headers["Authorization"] = "Bearer " + session.token;
+  } else {
+    headers["X-Omeka-Key-Identity"] = session.identity;
+    headers["X-Omeka-Key-Credential"] = session.credential;
+  }
+
+  const options = { method, headers, cache: "no-store" };
   if (data !== null) options.body = JSON.stringify(data);
 
   const response = await fetch(API_URL, options);
@@ -388,7 +475,8 @@ async function deleteWork(item) {
 reloadButton.addEventListener("click", loadWorks);
 cancelButton.addEventListener("click", resetForm);
 
-if (getKeys()) {
+readLoginReturn();
+if (getSession()) {
   showLoggedIn(true);
   loadWorks();
 } else {
