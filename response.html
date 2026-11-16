@@ -4,616 +4,396 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Artificial Inquiries</title>
-
 <style>
 * { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6fa;
-  color: #263238;
-}
-
-header {
-  background: #253b63;
-  color: white;
-  padding: 25px 8%;
-}
-
+body { margin: 0; font-family: Arial, sans-serif; background: #f4f6fa; color: #263238; }
+header { background: #253b63; color: white; padding: 25px 8%; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 header h1 { margin: 0 0 8px; }
 header p { margin: 0; color: #e0e7ff; }
-
-main {
-  max-width: 1000px;
-  margin: 35px auto;
-  padding: 0 20px;
-}
-
-.card {
-  background: white;
-  padding: 25px;
-  margin-bottom: 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px #0000000d;
-}
-
-h2 {
-  color: #253b63;
-  margin-top: 0;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-top: 15px;
-}
-
-input, textarea {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font: inherit;
-}
-
-textarea {
-  min-height: 90px;
-  resize: vertical;
-}
-
-button {
-  padding: 10px 16px;
-  margin-top: 15px;
-  margin-right: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:disabled {
-  opacity: .6;
-  cursor: wait;
-}
-
-.primary {
-  background: #253b63;
-  color: white;
-}
-
-.edit {
-  background: #e6a23c;
-  color: #222;
-}
-
-.delete {
-  background: #b42318;
-  color: white;
-}
-
-.item {
-  border: 1px solid #e0e5ed;
-  border-radius: 8px;
-  padding: 18px;
-  margin-top: 15px;
-  overflow-wrap: anywhere;
-}
-
+#user-bar { font-size: 14px; color: #e0e7ff; }
+#user-bar button { margin: 0 0 0 10px; background: #e0e7ff; color: #253b63; }
+main { max-width: 1000px; margin: 35px auto; padding: 0 20px; }
+.card { background: white; padding: 25px; margin-bottom: 25px; border-radius: 12px; box-shadow: 0 3px 12px #0000000d; }
+h2 { color: #253b63; margin-top: 0; }
+label { display: block; font-weight: bold; margin-top: 15px; }
+input, textarea { display: block; width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; }
+textarea { min-height: 90px; resize: vertical; }
+button { padding: 10px 16px; margin-top: 15px; margin-right: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+button:disabled { opacity: .6; cursor: wait; }
+.primary { background: #253b63; color: white; }
+.edit { background: #e6a23c; color: #222; }
+.delete { background: #b42318; color: white; }
+.item { border: 1px solid #e0e5ed; border-radius: 8px; padding: 18px; margin-top: 15px; overflow-wrap: anywhere; }
 .item h3 { margin-top: 0; }
 .item a { color: #2459a9; }
-
+.hint { color: #64748b; font-size: 14px; line-height: 1.5; }
 .message { margin-top: 15px; }
 .error { color: #a32222; }
 .success { color: #176b3a; }
-
-footer {
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
-}
+[hidden] { display: none !important; }
+footer { text-align: center; padding: 20px; color: #64748b; }
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Artificial Inquiries</h1>
-  <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
+  <div>
+    <h1>Artificial Inquiries</h1>
+    <p>Gestion des travaux exemplaires et des connaissances professionnelles</p>
+  </div>
+  <div id="user-bar" hidden>
+    Connectée à Omeka S
+    <button id="logout-button" type="button">Se déconnecter</button>
+  </div>
 </header>
 
 <main>
 
-  <section class="card">
+  <!-- CONNEXION -->
+  <section class="card" id="login-card">
     <h2>Connexion à Omeka S</h2>
-    <p>Gérez les travaux exemplaires enregistrés dans Omeka S.</p>
-
-    <button class="primary" id="reload-button" type="button">
-      Actualiser les travaux
-    </button>
-
-    <p id="message" class="message" role="status">
-      Chargement des travaux...
+    <p class="hint">
+      Connecte-toi avec <b>tes</b> clés API Omeka
+      (dans Omeka : <i>Mon compte → Clés API</i>).
+      Elles restent dans cet onglet et sont effacées à sa fermeture.
     </p>
-  </section>
-
-  <section class="card">
-    <h2 id="form-title">Ajouter un travail exemplaire</h2>
-
-    <form id="work-form">
-
-      <label for="title">Titre *</label>
-      <input id="title" name="title" required maxlength="250">
-
-      <label for="description">Description</label>
-      <textarea id="description" name="description"></textarea>
-
-      <label for="domain">Domaine professionnel</label>
-      <input id="domain" name="domain">
-
-      <label for="url">URL de référence</label>
-      <input id="url" name="url" type="url"
-             placeholder="https://exemple.com">
-
-      <button class="primary" id="save-button" type="submit">
-        Ajouter le travail
-      </button>
-
-      <button id="cancel-button" type="button" hidden>
-        Annuler la modification
-      </button>
-
+    <form id="login-form">
+      <label for="key-identity">Identifiant de clé (key_identity)</label>
+      <input id="key-identity" autocomplete="off" required>
+      <label for="key-credential">Clé secrète (key_credential)</label>
+      <input id="key-credential" type="password" autocomplete="off" required>
+      <button class="primary" id="login-button" type="submit">Se connecter</button>
     </form>
+    <p id="login-message" class="message" role="status"></p>
   </section>
 
-  <section class="card">
-    <h2>Travaux exemplaires</h2>
-    <p id="counter">Chargement...</p>
-    <div id="work-list"></div>
-  </section>
+  <!-- APPLICATION (visible une fois connectée) -->
+  <div id="app" hidden>
 
+    <section class="card">
+      <h2>Travaux exemplaires dans Omeka S</h2>
+      <button class="primary" id="reload-button" type="button">Actualiser les travaux</button>
+      <p id="message" class="message" role="status"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="form-title">Ajouter un travail exemplaire</h2>
+      <form id="work-form">
+        <label for="title">Titre *</label>
+        <input id="title" name="title" required maxlength="250">
+        <label for="description">Description</label>
+        <textarea id="description" name="description"></textarea>
+        <label for="domain">Domaine professionnel</label>
+        <input id="domain" name="domain">
+        <label for="url">URL de référence</label>
+        <input id="url" name="url" type="url" placeholder="https://exemple.com">
+        <button class="primary" id="save-button" type="submit">Ajouter le travail</button>
+        <button id="cancel-button" type="button" hidden>Annuler la modification</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Liste</h2>
+      <p id="counter"></p>
+      <div id="work-list"></div>
+    </section>
+
+  </div>
 </main>
 
-<footer>
-  Artificial Inquiries — Projet WebCognictive
-</footer>
+<footer>Artificial Inquiries — Projet WebCognitive</footer>
 
 <script>
-
 // =====================================================
 // CONFIGURATION
 // =====================================================
 
-const API_URL =
-  "https://artificial-inquiries-api.ineskasdi03.workers.dev/";
-
+const API_URL = "https://artificial-inquiries-api.ineskasdi03.workers.dev/";
 const DOMAIN_PROPERTY = "artinq:domaineProfessionnel";
 const URL_PROPERTY = "artinq:url";
+const STORAGE_KEY = "omeka-keys";
 
-
-// =====================================================
-// ELEMENTS HTML
-// =====================================================
-
-const list = document.getElementById("work-list");
-const message = document.getElementById("message");
-const counter = document.getElementById("counter");
-
-const reloadButton = document.getElementById("reload-button");
-
-const form = document.getElementById("work-form");
-const formTitle = document.getElementById("form-title");
-const saveButton = document.getElementById("save-button");
-const cancelButton = document.getElementById("cancel-button");
-
+const $ = id => document.getElementById(id);
+const list = $("work-list");
+const message = $("message");
+const counter = $("counter");
+const reloadButton = $("reload-button");
+const form = $("work-form");
+const formTitle = $("form-title");
+const saveButton = $("save-button");
+const cancelButton = $("cancel-button");
 let editingId = null;
 
 
 // =====================================================
-// FONCTION API SANS MOT DE PASSE
+// CONNEXION UTILISATEUR (clés API Omeka)
+// =====================================================
+
+function getKeys() {
+  try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY)); }
+  catch (_) { return null; }
+}
+
+function saveKeys(keys) {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(keys)); } catch (_) {}
+}
+
+function clearKeys() {
+  try { sessionStorage.removeItem(STORAGE_KEY); } catch (_) {}
+}
+
+function showLoggedIn(isLoggedIn) {
+  $("login-card").hidden = isLoggedIn;
+  $("app").hidden = !isLoggedIn;
+  $("user-bar").hidden = !isLoggedIn;
+}
+
+function logout(text = "") {
+  clearKeys();
+  resetForm();
+  list.replaceChildren();
+  showLoggedIn(false);
+  $("login-message").className = "message" + (text ? " error" : "");
+  $("login-message").textContent = text;
+}
+
+$("login-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const keys = {
+    identity: $("key-identity").value.trim(),
+    credential: $("key-credential").value.trim()
+  };
+  const loginButton = $("login-button");
+  loginButton.disabled = true;
+  $("login-message").className = "message";
+  $("login-message").textContent = "Vérification des clés auprès d'Omeka...";
+  saveKeys(keys);
+
+  // Les clés sont validées en lisant les travaux : Omeka les refuse si elles sont fausses.
+  const ok = await loadWorks();
+  loginButton.disabled = false;
+  if (ok) {
+    $("login-form").reset();
+    showLoggedIn(true);
+  }
+});
+
+$("logout-button").addEventListener("click", () => logout());
+
+
+// =====================================================
+// APPEL AU WORKER
 // =====================================================
 
 async function apiRequest(method, data = null) {
+  const keys = getKeys();
+  if (!keys) throw Object.assign(new Error("Connexion requise."), { status: 401 });
 
   const options = {
-    method: method,
+    method,
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      "Accept": "application/json",
+      "X-Omeka-Key-Identity": keys.identity,
+      "X-Omeka-Key-Credential": keys.credential
     },
     cache: "no-store"
   };
-
-  if (data !== null) {
-    options.body = JSON.stringify(data);
-  }
+  if (data !== null) options.body = JSON.stringify(data);
 
   const response = await fetch(API_URL, options);
-
   let result;
-
-  try {
-    result = await response.json();
-  } catch (_) {
-    throw new Error("Réponse invalide du serveur Cloudflare.");
-  }
+  try { result = await response.json(); }
+  catch (_) { throw new Error("Réponse invalide du serveur Cloudflare."); }
 
   if (!response.ok || !result.success) {
-    throw new Error(result.message || "Une erreur est survenue.");
+    throw Object.assign(new Error(result.message || "Une erreur est survenue."), { status: response.status });
   }
-
   return result;
 }
 
 
 // =====================================================
-// LECTURE DES PROPRIÉTÉS OMEKA
+// AFFICHAGE
 // =====================================================
 
 function getValue(item, property) {
-
   const values = item[property];
-
   if (!Array.isArray(values)) return "";
-
-  return values
-    .map(value => value["@value"] || value["@id"] || "")
-    .filter(Boolean)
-    .join(", ");
+  return values.map(v => v["@value"] || v["@id"] || "").filter(Boolean).join(", ");
 }
 
-
-// =====================================================
-// MESSAGES
-// =====================================================
-
 function setMessage(text, type = "") {
-
   message.className = "message " + type;
   message.textContent = text;
 }
 
-
-// =====================================================
-// AFFICHAGE DES TRAVAUX
-// =====================================================
-
 function addText(parent, tag, text) {
-
-  const element = document.createElement(tag);
-  element.textContent = text;
-  parent.appendChild(element);
-
-  return element;
+  const el = document.createElement(tag);
+  el.textContent = text;
+  parent.appendChild(el);
+  return el;
 }
 
 function renderWorks(items) {
-
   list.replaceChildren();
-
-  counter.textContent =
-    items.length + (items.length > 1 ? " travaux" : " travail");
-
-  if (!items.length) {
-    addText(list, "p", "Aucun travail exemplaire trouvé.");
-    return;
-  }
+  counter.textContent = items.length + (items.length > 1 ? " travaux" : " travail");
+  if (!items.length) { addText(list, "p", "Aucun travail exemplaire trouvé."); return; }
 
   items.forEach(item => {
-
     const article = document.createElement("article");
     article.className = "item";
-
-    addText(
-      article,
-      "h3",
-      item["o:title"] || "Sans titre"
-    );
-
-    addText(
-      article,
-      "p",
-      "Description : " +
-      (getValue(item, "dcterms:description") || "Non renseignée")
-    );
-
-    addText(
-      article,
-      "p",
-      "Domaine professionnel : " +
-      (getValue(item, DOMAIN_PROPERTY) || "Non renseigné")
-    );
+    addText(article, "h3", item["o:title"] || "Sans titre");
+    addText(article, "p", "Description : " + (getValue(item, "dcterms:description") || "Non renseignée"));
+    addText(article, "p", "Domaine professionnel : " + (getValue(item, DOMAIN_PROPERTY) || "Non renseigné"));
 
     const url = getValue(item, URL_PROPERTY);
-
     if (url) {
-
       try {
-
         const parsed = new URL(url);
-
         if (["http:", "https:"].includes(parsed.protocol)) {
-
           const link = document.createElement("a");
-
-          link.href = parsed.href;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
+          link.href = parsed.href; link.target = "_blank"; link.rel = "noopener noreferrer";
           link.textContent = "Consulter la référence";
-
           article.appendChild(link);
         }
-
-      } catch (_) {
-
-        addText(article, "p", "URL : " + url);
-      }
+      } catch (_) { addText(article, "p", "URL : " + url); }
     }
 
-    addText(
-      article,
-      "p",
-      "Identifiant Omeka S : " + item["o:id"]
-    );
+    addText(article, "p", "Identifiant Omeka S : " + item["o:id"]);
 
     const editButton = document.createElement("button");
-
-    editButton.type = "button";
-    editButton.className = "edit";
-    editButton.textContent = "Modifier";
-
-    editButton.addEventListener("click", () => {
-      startEditing(item);
-    });
-
+    editButton.type = "button"; editButton.className = "edit"; editButton.textContent = "Modifier";
+    editButton.addEventListener("click", () => startEditing(item));
     article.appendChild(editButton);
 
     const deleteButton = document.createElement("button");
-
-    deleteButton.type = "button";
-    deleteButton.className = "delete";
-    deleteButton.textContent = "Supprimer";
-
-    deleteButton.addEventListener("click", () => {
-      deleteWork(item);
-    });
-
+    deleteButton.type = "button"; deleteButton.className = "delete"; deleteButton.textContent = "Supprimer";
+    deleteButton.addEventListener("click", () => deleteWork(item));
     article.appendChild(deleteButton);
 
     list.appendChild(article);
   });
 }
 
+// Gestion commune des erreurs : clés refusées = retour à la connexion
+function handleError(prefix, error) {
+  if (error.status === 401) { logout(error.message); return; }
+  setMessage(prefix + error.message, "error");
+}
+
 
 // =====================================================
-// CHARGEMENT DES TRAVAUX
+// READ
 // =====================================================
 
 async function loadWorks() {
-
   reloadButton.disabled = true;
-
   setMessage("Chargement des travaux depuis Omeka S...");
-
-  counter.textContent = "Chargement...";
-  list.replaceChildren();
-
   try {
-
     const result = await apiRequest("GET");
-
-    if (!Array.isArray(result.items)) {
-      throw new Error("La liste des travaux est incorrecte.");
-    }
-
+    if (!Array.isArray(result.items)) throw new Error("La liste des travaux est incorrecte.");
     renderWorks(result.items);
-
-    const classId =
-      result.data && result.data.resource_class_id
-        ? " (classe Omeka " + result.data.resource_class_id + ")"
-        : "";
-
-    setMessage(
-      "Connexion à Omeka S réussie. Travaux chargés : " +
-      result.items.length +
-      classId +
-      ".",
-      "success"
-    );
-
+    const classId = result.data && result.data.resource_class_id
+      ? " (classe Omeka " + result.data.resource_class_id + ")" : "";
+    setMessage("Connexion à Omeka S réussie. Travaux chargés : " + result.items.length + classId + ".", "success");
+    return true;
   } catch (error) {
-
+    if (error.status === 401 || $("app").hidden) { logout(error.message); return false; }
     counter.textContent = "Indisponible";
-
-    setMessage(
-      "Impossible de charger les travaux : " + error.message,
-      "error"
-    );
-
+    setMessage("Impossible de charger les travaux : " + error.message, "error");
+    return false;
   } finally {
-
     reloadButton.disabled = false;
   }
 }
 
 
 // =====================================================
-// FORMULAIRE
+// CREATE / UPDATE
 // =====================================================
 
 function resetForm() {
-
   editingId = null;
-
   form.reset();
-
   formTitle.textContent = "Ajouter un travail exemplaire";
   saveButton.textContent = "Ajouter le travail";
-
   cancelButton.hidden = true;
 }
 
 function startEditing(item) {
-
   editingId = item["o:id"];
-
-  document.getElementById("title").value =
-    item["o:title"] || "";
-
-  document.getElementById("description").value =
-    getValue(item, "dcterms:description");
-
-  document.getElementById("domain").value =
-    getValue(item, DOMAIN_PROPERTY);
-
-  document.getElementById("url").value =
-    getValue(item, URL_PROPERTY);
-
+  $("title").value = item["o:title"] || "";
+  $("description").value = getValue(item, "dcterms:description");
+  $("domain").value = getValue(item, DOMAIN_PROPERTY);
+  $("url").value = getValue(item, URL_PROPERTY);
   formTitle.textContent = "Modifier le travail";
-
-  saveButton.textContent =
-    "Enregistrer les modifications";
-
+  saveButton.textContent = "Enregistrer les modifications";
   cancelButton.hidden = false;
-
-  form.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-
-// =====================================================
-// AJOUT ET MODIFICATION
-// =====================================================
-
 form.addEventListener("submit", async event => {
-
   event.preventDefault();
-
-  const title =
-    document.getElementById("title").value.trim();
-
-  const description =
-    document.getElementById("description").value.trim();
-
-  const domain =
-    document.getElementById("domain").value.trim();
-
-  const url =
-    document.getElementById("url").value.trim();
-
-  if (!title) {
-    setMessage("Le titre est obligatoire.", "error");
-    return;
-  }
-
   const data = {
-    title,
-    description,
-    domain,
-    url
+    title: $("title").value.trim(),
+    description: $("description").value.trim(),
+    domain: $("domain").value.trim(),
+    url: $("url").value.trim()
   };
+  if (!data.title) { setMessage("Le titre est obligatoire.", "error"); return; }
 
   saveButton.disabled = true;
-
   try {
-
     if (editingId === null) {
-
       await apiRequest("POST", data);
-
-      setMessage(
-        "Travail ajouté dans Omeka S.",
-        "success"
-      );
-
+      setMessage("Travail ajouté dans Omeka S.", "success");
     } else {
-
-      await apiRequest("PUT", {
-        id: editingId,
-        ...data
-      });
-
-      setMessage(
-        "Travail modifié dans Omeka S.",
-        "success"
-      );
+      await apiRequest("PUT", { id: editingId, ...data });
+      setMessage("Travail modifié dans Omeka S.", "success");
     }
-
     resetForm();
-
     await loadWorks();
-
   } catch (error) {
-
-    setMessage(
-      "Erreur : " + error.message,
-      "error"
-    );
-
+    handleError("Erreur : ", error);
   } finally {
-
     saveButton.disabled = false;
   }
 });
 
 
 // =====================================================
-// SUPPRESSION
+// DELETE
 // =====================================================
 
 async function deleteWork(item) {
-
   const id = item["o:id"];
-
   const title = item["o:title"] || "ce travail";
-
-  const confirmation = confirm(
-    'Confirmer la suppression de "' +
-    title +
-    '" (identifiant ' +
-    id +
-    ') ? Cette action est irréversible.'
-  );
-
-  if (!confirmation) return;
-
+  if (!confirm('Confirmer la suppression de "' + title + '" (identifiant ' + id + ') ? Cette action est irréversible.')) return;
   try {
-
     await apiRequest("DELETE", { id });
-
-    setMessage(
-      "Travail supprimé dans Omeka S.",
-      "success"
-    );
-
+    setMessage("Travail supprimé dans Omeka S.", "success");
     await loadWorks();
-
   } catch (error) {
-
-    setMessage(
-      "Erreur de suppression : " + error.message,
-      "error"
-    );
+    handleError("Erreur de suppression : ", error);
   }
 }
 
 
 // =====================================================
-// ÉVÉNEMENTS
+// DÉMARRAGE
 // =====================================================
 
 reloadButton.addEventListener("click", loadWorks);
-
 cancelButton.addEventListener("click", resetForm);
 
-// Chargement initial
-loadWorks();
-
+if (getKeys()) {
+  showLoggedIn(true);
+  loadWorks();
+} else {
+  showLoggedIn(false);
+}
 </script>
-
 </body>
 </html>
