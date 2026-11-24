@@ -48,7 +48,7 @@ Chaque critère est noté de **1 à 5**.
 
 ### Graphique radar
 
-![Ex13a – Graphique radar de l'évaluation de Wikipédia](radar_ex13a.png)
+![Ex13a – Graphique radar de l'évaluation de Wikipédia](resource-template/radar_ex13a.png)
 
 Le profil montre un document **très fréquent, très collaboratif et exigeant
 sur la fiabilité**, tout en restant accessible : l'expertise requise est la
