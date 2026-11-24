@@ -80,10 +80,10 @@ pratiques.
 
 ## 5. Application web : connexion et CRUD
 
-L'application (`index.html`) est publiée avec GitHub Pages. Elle permet de
+L'application (`response.html`) est publiée avec GitHub Pages. Elle permet de
 gérer les **travaux exemplaires** enregistrés dans l'Omeka S commun.
 
-**Application en ligne :** *(ajouter ici le lien GitHub Pages du dépôt)*
+**Application en ligne :** https://kasdiines.github.io/ArtificialInquiries_13/response.html
 
 ### Architecture
 
@@ -241,12 +241,15 @@ Le compte **`samszo`** est ajouté comme collaborateur du dépôt
 
 ## 9. Fichiers du dépôt
 
--   `index.html` : application web (connexion et CRUD sur Omeka S)
+-   `response.html` : application web (connexion et CRUD sur Omeka S)
 -   `README.md` : description, évaluation, justification, application,
     solutions techniques et protocole de test
 -   `radar_ex13a.png` : graphique radar de l'évaluation Ex13a
 -   `diagram_class.md` : diagramme de classes Mermaid
--   `captures_formulaire/` : captures des formulaires de l'exercice
+-   `artificial_inquiries.ttl` : vocabulaire RDF du projet (préfixe `artinq`)
+-   `resource-template/` : modèles de ressources Omeka S (travail exemplaire,
+    critère, évaluation, note de critère, justification, ressource documentaire)
+-   `01_…png` à `07_…png` : captures des formulaires de l'exercice
 
 ## 10. Références
 
@@ -265,24 +268,24 @@ Le compte **`samszo`** est ajouté comme collaborateur du dépôt
 
 ### Ex13 — Setting Up the Example
 
-![Ex13 – Setting Up the Example](captures_formulaire/01_ex13_setting_up_example.png)
+![Ex13 – Setting Up the Example](01_ex13_setting_up_example.png)
 
 ### Ex13a — Instructions et critères
 
-![Ex13a – Instructions](captures_formulaire/02_ex13a_instructions.png)
+![Ex13a – Instructions](02_ex13a_instructions.png)
 
-![Ex13a – Critères complémentaires](captures_formulaire/03_ex13a_criteria.png)
+![Ex13a – Critères complémentaires](03_ex13a_criteria.png)
 
 ### Ex13a — Tableau des critères
 
-![Ex13a – Tableau des critères](captures_formulaire/04_ex13a_table.png)
+![Ex13a – Tableau des critères](04_ex13a_table.png)
 
-![Ex13a – Suite du tableau](captures_formulaire/06_ex13a_table_continued.png)
+![Ex13a – Suite du tableau](06_ex13a_table_continued.png)
 
 ### Ex13a — Graphique radar vierge
 
-![Ex13a – Graphique radar vierge](captures_formulaire/05_ex13a_radar_graph.png)
+![Ex13a – Graphique radar vierge](05_ex13a_radar_graph.png)
 
 ### Ex13b — Fill in the Blanks
 
-![Ex13b – Formulaire à compléter](captures_formulaire/07_ex13b_fill_in_the_blanks.png)
+![Ex13b – Formulaire à compléter](07_ex13b_fill_in_the_blanks.png)
